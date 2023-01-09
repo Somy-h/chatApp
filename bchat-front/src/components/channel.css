@@ -1,0 +1,12 @@
+.channel-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.channel-btn {
+  border: none;
+  background-color: transparent;
+  font-size: 1.2rem;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+}
