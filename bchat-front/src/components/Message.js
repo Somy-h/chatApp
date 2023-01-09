@@ -2,6 +2,7 @@ import React from "react";
 import { useContext } from "react";
 import { UserContext } from "../context/user.context";
 import { SocketContext } from "../context/socket.context";
+import { stringAvatar } from "../utils/utils";
 
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
@@ -23,7 +24,8 @@ export default function Message(prop) {
   return (
     <ListItem alignItems='flex-start'>
       <ListItemAvatar>
-        <Avatar alt={message.user_name} src={message.avatar} />
+        <Avatar {...stringAvatar(message.user_name)} />
+        {/* <Avatar alt={message.user_name} src={message.avatar} /> */}
       </ListItemAvatar>
       <ListItemText
         primary={`${message.user_name}`}
