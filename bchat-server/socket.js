@@ -37,17 +37,17 @@ module.exports = async (io, pool) => {
           handleJoinChannel(socket, joinMessage);
 
           try {
-            const responseMsg = {
-              ...joinMessage,
-              message: `*** JOINED ${joinMessage.channel_name}`,
-              time: Date.now(),
-            };
-            console.log("Joined channel: ", joinMessage);
+            // const responseMsg = {
+            //   ...joinMessage,
+            //   message: `*** JOINED ${joinMessage.channel_name}`,
+            //   time: Date.now(),
+            // };
+            // console.log("Joined channel: ", joinMessage);
 
-            // Send join message to clients except the sender
-            socket
-              .to(String(joinMessage.channel_id))
-              .emit(MESSAGE_TYPE.RECEIVE_MESSAGE, responseMsg);
+            // // Send join message to clients except the sender
+            // socket
+            //   .to(String(joinMessage.channel_id))
+            //   .emit(MESSAGE_TYPE.RECEIVE_MESSAGE, responseMsg);
 
             // Fetch channel messages from DB
             getChannelMessagesFromDB(pool, joinMessage.channel_id).then(
@@ -161,16 +161,16 @@ function handleLeaveChannel(socket, leaveMsg) {
     users,
   });
 
-  const responseMsg = {
-    ...leaveMsg,
-    message: `*** LEFT ${leaveMsg.channel_name}`,
-    time: Date.now(),
-  };
+  // const responseMsg = {
+  //   ...leaveMsg,
+  //   message: `*** LEFT ${leaveMsg.channel_name}`,
+  //   time: Date.now(),
+  // };
 
-  // to clients in room
-  socket
-    .to(String(leaveMsg.channel_id))
-    .emit(MESSAGE_TYPE.RECEIVE_MESSAGE, responseMsg);
+  // // to clients in room
+  // socket
+  //   .to(String(leaveMsg.channel_id))
+  //   .emit(MESSAGE_TYPE.RECEIVE_MESSAGE, responseMsg);
 }
 
 //DB Library ***************
