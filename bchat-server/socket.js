@@ -185,30 +185,8 @@ async function getChannelsInitUsers(pool) {
       return (users[item.channel_name] = []);
     });
     console.log(users);
-  } catch (e) {
-    //new Error("Fail to get channels from database");
-
-    //!!!!!!!!!!
-    // For only test in case of db error ===>
-    // !! When you set up the database,
-    // then delete code below lines and uncomment upper line // new Error().
-    console.log("Fail to get channels from database");
-    channels = [
-      { id: 1, channel_name: "Channel 1" },
-      { id: 2, channel_name: "Channel 2" },
-      { id: 3, channel_name: "Channel 3" },
-      { id: 4, channel_name: "Channel 4" },
-      { id: 5, channel_name: "Channel 5" },
-    ];
-    users = {
-      "Channel 1": [],
-      "Channel 2": [],
-      "Channel 3": [],
-      "Channel 4": [],
-      "Channel 5": [],
-    };
-
-    console.log(users);
+  } catch (err) {
+    new Error("Fail to get channels from database");
   }
 }
 
@@ -226,34 +204,8 @@ async function getChannelMessagesFromDB(pool, channelId) {
     //const channelMessages = result[0];
 
     return result[0];
-  } catch (e) {
-    //new Error("Fail to get messages from database table");
-
-    //!!!!!!!!!!
-    // For only test in case of db error ===>
-    // !! When you set up the database,
-    // then delete code below lines and uncomment upper line // new Error().
-    console.log("Fail to get messages from database table");
-    return [
-      {
-        id: 1,
-        channel_id: channelId,
-        user_id: 3,
-        user_name: "Smith",
-        avatar: "😺",
-        message: "previous example message1",
-        time: Date.now(),
-      },
-      {
-        id: 2,
-        channel_id: channelId,
-        user_id: 3,
-        user_name: "Smith",
-        avatar: "🤡",
-        message: "previous example message2",
-        time: Date.now(),
-      },
-    ];
+  } catch (err) {
+    new Error("Fail to get messages from database table");
   }
 }
 
@@ -278,17 +230,8 @@ async function insertMessageIntoDB(pool, message) {
     const returnId = result[0]?.insertId;
     console.log("Inserted recent message id: ", returnId);
     return returnId;
-  } catch (e) {
-    //new Error("Fail to insert message into database table");
-
-    //!!!!!!!!!!
-    // For only test in case of db error ===>
-    // !! When you set up the database,
-    // then delete code below 2 lines and uncomment upper line // new Error().
-    console.log(
-      "DB Error: Cannot insert new message into table. For test, will return 1 to client"
-    );
-    return 1;
+  } catch (err) {
+    new Error("Fail to insert message into database table");
   }
 }
 
@@ -300,10 +243,7 @@ async function updateInactiveMessageFromDB(pool, messageId) {
       WHERE id = ${messageId}`);
     console.log("DB returned: ", result);
     return result[0]?.changedRows === 1 ? true : false;
-  } catch (e) {
-    //new Error("Fail to update messages table.");
-    //!!!!!!!!!!
-    // !! When you set up the database,
-    // then uncomment upper line // new Error().
+  } catch (err) {
+    new Error("Fail to update messages table.");
   }
 }
