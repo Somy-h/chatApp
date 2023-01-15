@@ -1,11 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { registerUser } from "../ApiServices/authService";
-import { useContext } from "react";
+import { updateUserProfile } from "../ApiServices/authService";
+import { useState, useContext } from "react";
 import { UserContext } from "../context/user.context";
 import { SocketContext } from "../context/socket.context";
 import { setJwt } from "../ApiServices/jwtService";
 import { stringAvatar } from "../utils/utils";
+import CollapseAlert from "../components/CollapseAlert";
+import { ALERT_TYPE } from "../components/CollapseAlert";
 
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
@@ -24,15 +26,23 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 
 export default function SettingPage() {
-  let navigate = useNavigate();
+  const navigate = useNavigate();
+
   const { currentUser, setCurrentUser } = useContext(UserContext);
   const { getChannelUsers } = useContext(SocketContext);
 
-  const [settingFormData, setSettingFormData] = React.useState({
+  //const [imageAvatar, setImageAvatar] = useState(null);
+  const [settingFormData, setSettingFormData] = useState({
     ...currentUser,
+    pwd: "",
     pwd2: "",
   });
-  const [showPassword, setShowPassword] = React.useState(false);
+
+  const [isError, setIsError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [previewAvatarURL, setPreviewAvatarURL] = useState(null);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -49,41 +59,103 @@ export default function SettingPage() {
   };
 
   const isValidField = () => {
-    if (settingFormData.pwd?.trim() === "") return false;
-    if (settingFormData.user_name?.trim() === "") return false;
+    // Check password
+    if (settingFormData.pwd !== settingFormData.pwd2) {
+      console.log("Passwords do not match");
+      displayErrorMessage(true, "Passwords do not match");
+      return false;
+    }
+    if (!settingFormData.user_name || !settingFormData.user_name?.trim()) {
+      displayErrorMessage(true, "User name should not be empty");
+      return false;
+    }
+
+    // success
+    displayErrorMessage(false);
     return true;
+  };
+
+  const displayErrorMessage = (isErr, errMessage = "") => {
+    setIsError(isErr);
+    setErrorMessage(errMessage);
+  };
+
+  const getAvatarFileInfo = (e) => {
+    if (e.target.files.length > 0) {
+      setSettingFormData((prevData) => ({
+        ...prevData,
+        avatar: e.target.files[0],
+      }));
+
+      setPreviewAvatarURL(URL.createObjectURL(e.target.files[0]));
+    }
   };
 
   const handleUpdateSetting = async () => {
     //Validate the fields
     if (!isValidField()) return;
 
-    //!!! HAVE TO PROVIDE UPDATE USER
-    /*
-    const data = await updateUser(settingFormData);
-    console.log(data);
+    // Make Request data with image file
+    const formData = new FormData();
+    formData.append("id", settingFormData.id);
+    formData.append("user_name", settingFormData.user_name);
+    settingFormData.pwd && formData.append("pwd", settingFormData.pwd);
+    console.log(previewAvatarURL ? "yes" : "no ");
+    previewAvatarURL &&
+      formData.append(
+        "avatar",
+        settingFormData?.avatar,
+        settingFormData?.avatar?.name
+      );
+    formData.forEach((item) => console.log(item));
 
-    if (data) {
-      const token = data.jwt;
-      //console.log("token: ", token);
-      //set Jwt
-      setJwt(token);
+    // Call API to update the user settings
+    try {
+      const data = await updateUserProfile(formData);
+      if (data) {
+        const token = data.jwt;
+        console.log("token: ", token);
 
-      //set current user
-      const payload = JSON.parse(window.atob(token.split(".")[1]));
-      //console.log(payload);
-      setCurrentUser({
-        ...payload,
-      });
+        //Check if the update was successful
+        if (token) {
+          setJwt(token);
+          //set updated current user
+          const payload = JSON.parse(window.atob(token.split(".")[1]));
+
+          console.log(payload);
+          setCurrentUser({
+            ...payload,
+          });
+
+          getChannelUsers();
+          navigate("/chat");
+        } else {
+          console.log(data);
+          displayErrorMessage(true, data);
+        }
+      }
+    } catch (err) {
+      console.log("Update Error: ", err);
     }
-    */
+  };
 
-    getChannelUsers();
+  const handleCancel = () => {
     navigate("/chat");
   };
 
-  const handleUpdateAvatar = () => {
-    console.log("updateAvatar");
+  const displayAvatar = () => {
+    if (previewAvatarURL) {
+      return <Avatar src={previewAvatarURL} sx={{ width: 64, height: 64 }} />;
+    } else if (currentUser.avatar) {
+      return <Avatar src={currentUser.avatar} sx={{ width: 64, height: 64 }} />;
+    } else {
+      return (
+        <Avatar
+          {...stringAvatar(settingFormData.user_name)}
+          sx={{ width: 64, height: 64 }}
+        />
+      );
+    }
   };
 
   return (
@@ -107,30 +179,24 @@ export default function SettingPage() {
       >
         <Box
           sx={{
-            width: "50%",
+            width: "40%",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
           }}
         >
-          <Avatar
-            {...stringAvatar(settingFormData.user_name)}
-            sx={{ width: 64, height: 64 }}
-          />
-          <Typography
-            gutterBottom
-            variant='body1'
-            component='div'
-            sx={{ m: 1 }}
-          >
-            <IconButton
-              aria-label='upload avatar'
-              onClick={handleUpdateAvatar}
-              color='primary'
-            >
-              <AddPhotoAlternateIcon />
-            </IconButton>
-          </Typography>
+          {displayAvatar()}
+
+          <label for='input_avatar'>
+            <AddPhotoAlternateIcon sx={{ color: "blue", cursor: "pointer" }} />
+            <input
+              id='input_avatar'
+              style={{ display: "none" }}
+              type='file'
+              accept='image/gif, image/jpeg, image/png'
+              onChange={getAvatarFileInfo}
+            ></input>
+          </label>
         </Box>
         <Box
           component='form'
@@ -147,17 +213,30 @@ export default function SettingPage() {
             <Typography gutterBottom variant='h5' component='div'>
               USER SETTINGS
             </Typography>
+            <CollapseAlert alertType={ALERT_TYPE.ERROR} isOpen={isError}>
+              {errorMessage}
+            </CollapseAlert>
+
+            <FormControl sx={{ m: 1, width: "25ch" }} variant='outlined'>
+              <InputLabel>User Name</InputLabel>
+              <OutlinedInput
+                type='text'
+                name='user_name'
+                value={settingFormData.user_name}
+                onChange={handleFormChange}
+              />
+            </FormControl>
+
             <TextField
-              name='user_name'
               required
-              value={currentUser.user_name}
-              onChange={handleFormChange}
+              name='email'
+              value={currentUser.email}
+              disabled
             />
-            <TextField required name='email' label='email' disabled />
 
             <FormControl sx={{ m: 1, width: "25ch" }} variant='outlined'>
               <InputLabel htmlFor='outlined-adornment-password'>
-                Password
+                Change Password
               </InputLabel>
               <OutlinedInput
                 id='outlined-adornment-password'
@@ -198,10 +277,14 @@ export default function SettingPage() {
                   </InputAdornment>
                 }
                 name='pwd2'
+                onChange={handleFormChange}
               />
             </FormControl>
           </CardContent>
           <CardActions>
+            <Button variant='contained' onClick={handleCancel}>
+              Cancel
+            </Button>
             <Button variant='contained' onClick={handleUpdateSetting}>
               Update
             </Button>
