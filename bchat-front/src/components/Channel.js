@@ -4,20 +4,9 @@ import { UserContext } from "../context/user.context";
 import CollapseChannelItem from "./CollapseChannelItem";
 
 import List from "@mui/material/List";
-// import ListItem from "@mui/material/ListItem";
-// import ListItemIcon from "@mui/material/ListItemIcon";
-// import ListItemText from "@mui/material/ListItemText";
-// import ListItemButton from "@mui/material/ListItemButton";
-// import ListItemAvatar from "@mui/material/ListItemAvatar";
-// import GroupIcon from "@mui/icons-material/Group";
-// import ExpandLess from "@mui/icons-material/ExpandLess";
-// import ExpandMore from "@mui/icons-material/ExpandMore";
-// import Collapse from "@mui/material/Collapse";
-// import Avatar from "@mui/material/Avatar";
 
 export default function Channel() {
-  const { channelUsers, getChannelUsers, joinChannel, leaveChannel } =
-    useContext(SocketContext);
+  const { channelUsers, joinChannel, leaveChannel } = useContext(SocketContext);
   const { currentUser, currentChannel, setCurrentChannel } =
     useContext(UserContext);
 
@@ -54,10 +43,6 @@ export default function Channel() {
     joinChannel(joinMessage);
     // Set current channel in user context
     setCurrentChannel({ channel_id: id, channel_name: name });
-  };
-
-  const handleExpand = (expand, channelId) => {
-    console.log("Click: channelUsers:", channelUsers);
   };
 
   const channelList = () =>
