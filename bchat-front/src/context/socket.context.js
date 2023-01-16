@@ -90,6 +90,7 @@ export const SocketProvider = ({ children }) => {
   function leaveChannel(message) {
     socket.emit(MESSAGE_TYPE.LEAVE_CHANNEL, message);
     setChannelMessages(null);
+    getChannelUsers();
   }
 
   return (

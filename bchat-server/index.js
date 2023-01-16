@@ -7,6 +7,11 @@ const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
+const multer = require("multer"); // For uploading avatar image file
+const path = require("path");
+const imageAvatarPath = path.join(__dirname, "/public/images/avatar");
+
+//console.log(imageAvatarPath);
 require("dotenv").config();
 
 const corsOptions = {
@@ -41,45 +46,6 @@ app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
 
-// app.use(async (req, res, next) => {
-//   try {
-//     req.db = await pool.getConnection();
-//     req.db.connection.config.namedPlaceholders = true;
-
-//     // Traditional mode ensures not null is respected for unsupplied fields, ensures valid JavaScript dates, etc.
-//     await req.db.query('SET SESSION sql_mode = "TRADITIONAL"');
-//     await req.db.query(`SET time_zone = '-8:00'`);
-
-//     await next();
-
-//     req.db.release();
-//   } catch (err) {
-//     // If anything downstream throw an error, we must release the connection allocated for the request
-//     console.log(err);
-//     if (req.db) req.db.release();
-//     throw err;
-//   }
-// });
-
-app.get("/students", (req, res) => {
-  const students = [
-    {
-      id: 1,
-      name: "Ramiro",
-    },
-    {
-      id: 2,
-      name: "Bryan",
-    },
-    {
-      id: 3,
-      name: "Kenneth",
-    },
-  ];
-  console.log("students");
-  res.json({ students });
-});
-
 app.use(async (req, res, next) => {
   try {
     req.db = await pool.getConnection();
@@ -101,45 +67,40 @@ app.use(async (req, res, next) => {
 });
 
 app.post("/register", async (req, res) => {
-  try {
-    let encodedUser;
-    console.log("req.body", req.body);
-    // Hashes the password and inserts the info into the `user` table
-    await bcrypt.hash(req.body.pwd, 10).then(async (hash) => {
-      try {
-        console.log("Hashed the password ", hash);
-        const [user] = await req.db.query(
-          `
+  //console.log("req.body", req.body);
+  // Hashes the password and inserts the info into the `user` table
+  await bcrypt.hash(req.body.pwd, 10).then(async (hash) => {
+    try {
+      console.log("Hashed the password ", hash);
+      const [user] = await req.db.query(
+        `
           INSERT INTO users (email, pwd, user_name)
           VALUES (:email, :pwd, :user_name);
         `,
-          {
-            email: req.body.email,
-            pwd: hash,
-            user_name: req.body.user_name,
-          }
-        );
+        {
+          email: req.body.email,
+          pwd: hash,
+          user_name: req.body.user_name,
+        }
+      );
 
-        encodedUser = jwt.sign(
-          {
-            id: user.insertId,
-            email: req.body.email,
-            user_name: req.body.user_name,
-            avatar: null,
-          },
-          process.env.JWT_KEY
-        );
-      } catch (error) {
-        console.log("error", error);
-      }
-    });
+      const encodedUser = jwt.sign(
+        {
+          id: user.insertId,
+          email: req.body.email,
+          user_name: req.body.user_name,
+          avatar: null,
+        },
+        process.env.JWT_KEY
+      );
 
-    console.log("encoded user", encodedUser);
-    res.json({ jwt: encodedUser });
-  } catch (err) {
-    console.log("err", err);
-    res.json({ err });
-  }
+      console.log("encoded user", encodedUser);
+      res.json({ jwt: encodedUser });
+    } catch (err) {
+      console.log("error", err);
+      res.json("Failed to register user");
+    }
+  });
 });
 
 app.post("/authenticate", async function (req, res) {
@@ -153,7 +114,9 @@ app.post("/authenticate", async function (req, res) {
     console.log("user", email, pwd);
 
     if (!user) {
+      console.log("Email not found");
       res.json("Email not found");
+      return;
     }
 
     const dbPassword = `${user.pwd}`;
@@ -171,9 +134,117 @@ app.post("/authenticate", async function (req, res) {
 
       res.json({ jwt: encodedUser });
     } else {
+      console.log("Password not found");
       res.json("Password not found");
     }
   } catch (err) {
     console.log("Error in /authenticate", err);
+    res.json("Failed to authenticate user");
+  }
+});
+
+// Update User Profile
+app.use(express.static("public"));
+//app.use("/images/avatar", express.static("images/avatar"));
+
+// Jwt verification checks to see if there is an authorization header with a valid jwt in it.
+app.use(async function verifyJwt(req, res, next) {
+  if (!req.headers.authorization) {
+    return res.json("Invalid authorization, no authorization headers");
+  }
+  console.log("verify: ", req.headers.authorization);
+  const [scheme, token] = req.headers.authorization.split(" ");
+
+  if (scheme !== "Bearer") {
+    return res.json("Invalid authorization, invalid authorization scheme");
+  }
+
+  try {
+    const payload = jwt.verify(token, process.env.JWT_KEY);
+    req.user = payload;
+    console.log("verifyJWT: ", payload);
+  } catch (err) {
+    console.log(err);
+    if (
+      err.message &&
+      (err.message.toUpperCase() === "INVALID TOKEN" ||
+        err.message.toUpperCase() === "JWT EXPIRED")
+    ) {
+      req.status = err.status || 500;
+      req.body = err.message;
+      req.app.emit("jwt-error", err, req);
+    } else {
+      throw (err.status || 500, err.message);
+    }
+  }
+
+  await next();
+});
+
+const storage = multer.diskStorage({
+  destination: imageAvatarPath,
+  filename: (req, file, cb) => {
+    const uniqueSuffix = "-" + Date.now() + path.extname(file.originalname);
+    cb(null, `${file.originalname}${uniqueSuffix}`);
+  },
+});
+
+const imageUpload = multer({
+  storage: storage,
+}).single("avatar");
+
+app.post("/updateUserProfile", imageUpload, async (req, res, err) => {
+  if (err === true) {
+    console.log(err.message);
+    res.json({
+      success: false,
+      msg: "Avatar image is not updated!",
+    });
+  } else {
+    try {
+      let hash;
+      if (req.body.pwd) {
+        hash = await bcrypt.hash(req.body.pwd, 10);
+        console.log("Hashed the password ", hash);
+      }
+      const avatarURL = req.file
+        ? `${process.env.BACK_URL}/images/avatar/${req.file.filename}`
+        : null;
+      console.log("avatarURL: ", avatarURL);
+      await req.db.query(
+        `UPDATE users 
+         SET 
+          user_name = COALESCE(:user_name, user_name),
+          pwd=COALESCE(:pwd, pwd), 
+          avatar=COALESCE(:avatar, avatar)
+         WHERE id =:id`,
+        {
+          user_name: req.body.user_name,
+          pwd: hash,
+          avatar: avatarURL,
+          id: req.body.id,
+        }
+      );
+
+      const [[user]] = await req.db.query(
+        `SELECT * FROM users WHERE id = :id`,
+        { id: req.body.id }
+      );
+
+      const encodedUser = jwt.sign(
+        {
+          id: user.id,
+          email: user.email,
+          user_name: user.user_name,
+          avatar: user.avatar,
+        },
+        process.env.JWT_KEY
+      );
+      console.log("encoded user", encodedUser);
+      res.json({ jwt: encodedUser });
+    } catch (err) {
+      console.log("error", err);
+      res.json("Failed to update user profile");
+    }
   }
 });

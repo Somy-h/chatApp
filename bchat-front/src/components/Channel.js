@@ -1,13 +1,12 @@
 import React, { useContext } from "react";
 import { SocketContext } from "../context/socket.context";
 import { UserContext } from "../context/user.context";
+import CollapseChannelItem from "./CollapseChannelItem";
 
 import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
 
 export default function Channel() {
-  const { channelUsers, getChannelUsers, joinChannel, leaveChannel } =
-    useContext(SocketContext);
+  const { channelUsers, joinChannel, leaveChannel } = useContext(SocketContext);
   const { currentUser, currentChannel, setCurrentChannel } =
     useContext(UserContext);
 
@@ -47,19 +46,17 @@ export default function Channel() {
   };
 
   const channelList = () =>
-    channelUsers?.channels?.map((channel) => {
-      return (
-        <ListItemButton
-          key={channel.id}
-          onClick={() => handleJoinChannel(channel.id, channel.channel_name)}
-        >
-          {channel.channel_name}
-        </ListItemButton>
-      );
-    });
+    channelUsers?.channels?.map((channel) => (
+      <CollapseChannelItem
+        currentChannelId={currentChannel?.channel_id}
+        channel={channel}
+        handleJoinChannel={handleJoinChannel}
+      />
+    ));
 
   return (
     <List
+      size='sm'
       sx={{
         width: "100%",
         minWidth: 250,
