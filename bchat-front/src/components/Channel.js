@@ -1,9 +1,19 @@
 import React, { useContext } from "react";
 import { SocketContext } from "../context/socket.context";
 import { UserContext } from "../context/user.context";
+import CollapseChannelItem from "./CollapseChannelItem";
 
 import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
+// import ListItem from "@mui/material/ListItem";
+// import ListItemIcon from "@mui/material/ListItemIcon";
+// import ListItemText from "@mui/material/ListItemText";
+// import ListItemButton from "@mui/material/ListItemButton";
+// import ListItemAvatar from "@mui/material/ListItemAvatar";
+// import GroupIcon from "@mui/icons-material/Group";
+// import ExpandLess from "@mui/icons-material/ExpandLess";
+// import ExpandMore from "@mui/icons-material/ExpandMore";
+// import Collapse from "@mui/material/Collapse";
+// import Avatar from "@mui/material/Avatar";
 
 export default function Channel() {
   const { channelUsers, getChannelUsers, joinChannel, leaveChannel } =
@@ -46,20 +56,22 @@ export default function Channel() {
     setCurrentChannel({ channel_id: id, channel_name: name });
   };
 
+  const handleExpand = (expand, channelId) => {
+    console.log("Click: channelUsers:", channelUsers);
+  };
+
   const channelList = () =>
-    channelUsers?.channels?.map((channel) => {
-      return (
-        <ListItemButton
-          key={channel.id}
-          onClick={() => handleJoinChannel(channel.id, channel.channel_name)}
-        >
-          {channel.channel_name}
-        </ListItemButton>
-      );
-    });
+    channelUsers?.channels?.map((channel) => (
+      <CollapseChannelItem
+        currentChannelId={currentChannel?.channel_id}
+        channel={channel}
+        handleJoinChannel={handleJoinChannel}
+      />
+    ));
 
   return (
     <List
+      size='sm'
       sx={{
         width: "100%",
         minWidth: 250,
