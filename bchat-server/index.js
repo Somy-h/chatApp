@@ -143,8 +143,41 @@ app.post("/authenticate", async function (req, res) {
   }
 });
 
-// Update User Profile
+// Jwt verification checks to see if there is an authorization header with a valid jwt in it.
+app.use(async function verifyJwt(req, res, next) {
+  if (!req.headers.authorization) {
+    res.json("Invalid authorization, no authorization headers");
+  }
 
+  const [scheme, token] = req.headers.authorization.split(" ");
+
+  if (scheme !== "Bearer") {
+    res.json("Invalid authorization, invalid authorization scheme");
+  }
+
+  try {
+    const payload = jwt.verify(token, process.env.JWT_KEY);
+    req.user = payload;
+    console.log("verifyJWT: ", payload);
+  } catch (err) {
+    console.log(err);
+    if (
+      err.message &&
+      (err.message.toUpperCase() === "INVALID TOKEN" ||
+        err.message.toUpperCase() === "JWT EXPIRED")
+    ) {
+      req.status = err.status || 500;
+      req.body = err.message;
+      req.app.emit("jwt-error", err, req);
+    } else {
+      throw (err.status || 500, err.message);
+    }
+  }
+
+  await next();
+});
+
+// Update User Profile
 app.use(express.static("public"));
 
 const storage = multer.diskStorage({
