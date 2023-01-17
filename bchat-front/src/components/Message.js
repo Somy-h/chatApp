@@ -13,7 +13,6 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import { blue, cyan } from "@mui/material/colors";
 
 export default function Message(prop) {
   const { message } = prop;
@@ -53,8 +52,9 @@ export default function Message(prop) {
       <Grid container direction="row" alignItems="flex-start" justifyContent={messageType.messageOrientation} spacing={2}>
         {/* avatar grid */}
         <Grid item xs="auto">
-          <Avatar {...stringAvatar(message.user_name)} />
-          {/* <Avatar alt={message.user_name} src={message.avatar} /> */}
+          {message.avatar === null ? (
+              <Avatar {...stringAvatar(message.user_name)} />
+            ) : <Avatar alt={message.user_name} src={message.avatar} />}
         </Grid>
         {/* user time and message container */}
         <Grid item xs={5}>
@@ -94,56 +94,4 @@ export default function Message(prop) {
       </Grid>
     </Box> 
   );
-
-  //   <ListItem alignItems="flex-end">
-  //     <ListItemText
-  //       primary={`${message.user_name}`}
-  //       secondary={
-  //         <React.Fragment>
-  //           <Typography
-  //             sx={{ display: "inline" }}
-  //             component='span'
-  //             variant='body2'
-  //             color='text.primary'
-  //           >
-  //             {message.time}
-  //           </Typography>
-  //         </React.Fragment>
-  //       }
-  //     />
-  //   </ListItem>
-
-
-
-
-  //original
-  // return (
-  //   <ListItem alignItems="flex-end">
-  //     <ListItemAvatar>
-  //       <Avatar {...stringAvatar(message.user_name)} />
-  //       {/* <Avatar alt={message.user_name} src={message.avatar} /> */}
-  //     </ListItemAvatar>
-  //     <ListItemText
-  //       primary={`${message.user_name}`}
-  //       secondary={
-  //         <React.Fragment>
-  //           <Typography
-  //             sx={{ display: "inline" }}
-  //             component='span'
-  //             variant='body2'
-  //             color='text.primary'
-  //           >
-  //             {message.message}
-  //           </Typography>
-  //         </React.Fragment>
-  //       }
-  //     />
-  //     {message.user_id === currentUser.id ? (
-  //       <IconButton aria-label='delete' onClick={handleDeleteMessage}>
-  //         <DeleteIcon />
-  //       </IconButton>
-  //     ) : null}
-  //   </ListItem>
-  // );
-
 }
