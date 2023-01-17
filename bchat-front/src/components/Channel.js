@@ -56,7 +56,6 @@ export default function Channel() {
 
   return (
     <List
-      size='sm'
       sx={{
         width: "100%",
         minWidth: 250,

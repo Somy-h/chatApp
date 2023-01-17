@@ -7,11 +7,14 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import GroupIcon from "@mui/icons-material/Group";
+import Tooltip from "@mui/material/Tooltip";
+import IconButton from "@mui/material/IconButton";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import LoginIcon from "@mui/icons-material/Login";
 import Collapse from "@mui/material/Collapse";
 import Avatar from "@mui/material/Avatar";
+import Chip from "@mui/material/Chip";
 
 export default function CollapseChannelItem({
   currentChannelId,
@@ -20,15 +23,15 @@ export default function CollapseChannelItem({
 }) {
   const { channelUsers } = useContext(SocketContext);
 
-  const [isExpand, setIsExpand] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleExpand = (e) => {
-    setIsExpand((prev) => !prev);
+    setIsCollapsed((prev) => !prev);
     e.stopPropagation();
   };
 
   const onClickJoinChannel = () => {
-    setIsExpand(true);
+    setIsCollapsed(true);
     handleJoinChannel(channel.id, channel.channel_name);
   };
   return (
@@ -46,23 +49,51 @@ export default function CollapseChannelItem({
           <GroupIcon />
         </ListItemIcon>
         <ListItemText primary={channel.channel_name} />
-        <LoginIcon
-          sx={{ color: "blue", cursor: "pointer", mr: 2 }}
-          onClick={onClickJoinChannel}
-        />
-        {isExpand ? (
-          <ExpandLess
-            onClick={handleExpand}
-            sx={{ color: "blue", cursor: "pointer" }}
-          />
-        ) : (
-          <ExpandMore
-            onClick={handleExpand}
-            sx={{ color: "blue", cursor: "pointer" }}
-          />
-        )}
+        <Tooltip
+          title={`join ${channel.channel_name}`}
+          variant='outlined'
+          color='info'
+          size='sm'
+          placement='left-end'
+        >
+          <IconButton
+            color='primary'
+            onClick={onClickJoinChannel}
+            size='small'
+            aria-label='join channel'
+          >
+            <LoginIcon fontSize='small' />
+          </IconButton>
+        </Tooltip>
+        <Tooltip
+          title={`${isCollapsed ? "hide users" : "show users"}`}
+          variant='outlined'
+          placement='right-end'
+          color='info'
+          size='sm'
+        >
+          {isCollapsed ? (
+            <IconButton
+              color='primary'
+              onClick={handleExpand}
+              size='small'
+              aria-label='showed channel users'
+            >
+              <ExpandLess fontSize='small' />
+            </IconButton>
+          ) : (
+            <IconButton
+              color='primary'
+              onClick={handleExpand}
+              size='small'
+              aria-label='hided channel users'
+            >
+              <ExpandMore fontSize='small' />
+            </IconButton>
+          )}
+        </Tooltip>
       </ListItem>
-      <Collapse in={isExpand} timeout='auto' unmountOnExit>
+      <Collapse in={isCollapsed} timeout='auto' unmountOnExit>
         <List component='div' disablePadding>
           {channelUsers.users[channel.channel_name].map((user) => (
             <ListItem key={user.id} dense>
