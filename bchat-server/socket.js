@@ -64,16 +64,18 @@ module.exports = async (io, pool) => {
 
         // Insert message into DB
         insertMessageIntoDB(pool, message).then((msgId) => {
-          const msg = {
-            ...message,
-            id: msgId,
-          };
+          fetchMessageFromDB(pool, msgId).then((newMsg) => {
+            const msg = {
+              ...newMsg,
+              id: msgId,
+            };
 
-          console.log("send to client new message ID: ", msgId, socket.rooms);
-          console.dir(msg);
-          socket.nsp
-            .to(String(msg.channel_id))
-            .emit(MESSAGE_TYPE.RECEIVE_MESSAGE, msg);
+            console.log("send to client new message ID: ", msgId, socket.rooms);
+            console.dir(msg);
+            socket.nsp
+              .to(String(msg.channel_id))
+              .emit(MESSAGE_TYPE.RECEIVE_MESSAGE, msg);
+          });
         });
       });
 
@@ -214,5 +216,18 @@ async function updateInactiveMessageFromDB(pool, messageId) {
     return result[0]?.changedRows === 1 ? true : false;
   } catch (err) {
     throw new Error("Fail to update messages table.");
+  }
+}
+
+async function fetchMessageFromDB(pool, messageId) {
+  try {
+    const [[message]] = await pool.query(`
+      SELECT *
+      FROM messages
+      WHERE id = ${messageId}`);
+    console.log("DB returned: ", message);
+    return message;
+  } catch (err) {
+    throw new Error("Fail to fetch last updated message.");
   }
 }

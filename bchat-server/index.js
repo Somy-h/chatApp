@@ -145,7 +145,6 @@ app.post("/authenticate", async function (req, res) {
 
 // Update User Profile
 app.use(express.static("public"));
-//app.use("/images/avatar", express.static("images/avatar"));
 
 // Jwt verification checks to see if there is an authorization header with a valid jwt in it.
 app.use(async function verifyJwt(req, res, next) {
