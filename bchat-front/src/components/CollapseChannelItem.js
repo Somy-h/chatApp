@@ -14,20 +14,20 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import LoginIcon from "@mui/icons-material/Login";
 import Collapse from "@mui/material/Collapse";
 import Avatar from "@mui/material/Avatar";
-import Chip from "@mui/material/Chip";
 
 export default function CollapseChannelItem({
   currentChannelId,
   channel,
   handleJoinChannel,
 }) {
-  const { channelUsers } = useContext(SocketContext);
+  const { channelUsers, getChannelUsers } = useContext(SocketContext);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleExpand = (e) => {
     setIsCollapsed((prev) => !prev);
     e.stopPropagation();
+    getChannelUsers();
   };
 
   const onClickJoinChannel = () => {
