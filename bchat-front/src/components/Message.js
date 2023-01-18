@@ -66,46 +66,54 @@ export default function Message(prop) {
     <Box sx={messageType.messageOrientation}>
       <Paper elevation={7} sx={messageType.messageLayout}> 
         <Grid container direction="row" alignItems="flex-start" justifyContent="space-between">
-          {/* avatar grid */}
-          <Grid item xs="auto">
-            {message.avatar === null ? (
-                <Avatar {...stringLargeAvatar(message.user_name)} />
-              ) : <Avatar sx={{width: 45, height: 45 }} alt={message.user_name} src={message.avatar} />}
-          </Grid>
-          {/* user time and message container */}
-          <Grid item xs={10}>
-            <Grid container>
-              {/* name and date container */}
-              <Grid xs={12}>
-                <Grid container direction="row" justifyContent="flex-start" alignItems="flex-start" spacing={5}>
-                  <Grid item xs="auto">
-                    <Typography variant="h6">{message.user_name}</Typography>
-                  </Grid>
-                  <Grid item xs="auto">
-                  <Typography variant="subtitle2">{messageTimestamp}</Typography>
+          <Grid container direction="row" alignItems="flex-start" justifyContent="space-between">
+            <Grid item xs="11">
+              <Grid container direction="row" alignItems="flex-start" spacing={1}>
+                {/* avatar grid */}
+                <Grid item xs="auto">
+                  {message.avatar === null ? (
+                      <Avatar {...stringLargeAvatar(message.user_name)} />
+                    ) : <Avatar sx={{width: 45, height: 45 }} alt={message.user_name} src={message.avatar} />}
+                </Grid>
+                {/* user time and message container */}
+                <Grid item xs={10}>
+                  <Grid container>
+                    {/* name and date container */}
+                    <Grid xs={12}>
+                      <Grid container direction="row" justifyContent="flex-start" alignItems="flex-start" spacing={5}>
+                        <Grid item xs="auto">
+                          <Typography variant="h6">{message.user_name}</Typography>
+                        </Grid>
+                        <Grid item xs="auto">
+                        <Typography variant="subtitle2">{messageTimestamp}</Typography>
+                        </Grid>
+                      </Grid>
+                    </Grid>
+                    {/* message grid */}
+                    <Grid item xs={12}>
+                      <Typography
+                        sx={{ display: "inline" }}
+                        component='span'
+                        variant='body2'
+                        color='text.primary'
+                      >
+                        {message.message}
+                      </Typography>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
-              {/* message grid */}
-              <Grid item xs={12}>
-                <Typography
-                  sx={{ display: "inline" }}
-                  component='span'
-                  variant='body2'
-                  color='text.primary'
-                >
-                  {message.message}
-                </Typography>
+            </Grid>
+            <Grid item xs="auto">  
+              {/* user delete message button grid*/}
+              <Grid item xs="auto" direction="row" justifyContent="flex-end" alignItems="flex-start">
+                {message.user_id === currentUser.id ? (
+                    <IconButton sx={{margin: 0, padding: 0, display: 'flex', alignSelf: 'flex-end'}} aria-label='delete' onClick={handleDeleteMessage}>
+                      <DeleteIcon />
+                    </IconButton>
+                  ) : null}
               </Grid>
             </Grid>
-          </Grid>
-          {/* user delete message button grid*/}
-          <Grid item xs="auto" direction="row" justifyContent="flex-end" alignItems="flex-start">
-            {message.user_id === currentUser.id ? (
-                <IconButton sx={{margin: 0, padding: 0, display: 'flex', alignSelf: 'flex-end'}} aria-label='delete' onClick={handleDeleteMessage}>
-                  <DeleteIcon />
-                </IconButton>
-              ) : null}
           </Grid>
         </Grid>
       </Paper>
