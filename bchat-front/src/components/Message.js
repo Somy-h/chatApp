@@ -16,6 +16,7 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import { blue, cyan } from "@mui/material/colors";
 
+
 export default function Message(prop) {
   const { message } = prop;
   const { currentUser } = useContext(UserContext);
@@ -113,4 +114,56 @@ export default function Message(prop) {
       </Paper>
     </Box>
   );
+
+  //   <ListItem alignItems="flex-end">
+  //     <ListItemText
+  //       primary={`${message.user_name}`}
+  //       secondary={
+  //         <React.Fragment>
+  //           <Typography
+  //             sx={{ display: "inline" }}
+  //             component='span'
+  //             variant='body2'
+  //             color='text.primary'
+  //           >
+  //             {message.time}
+  //           </Typography>
+  //         </React.Fragment>
+  //       }
+  //     />
+  //   </ListItem>
+
+
+
+
+  //original
+  // return (
+  //   <ListItem alignItems="flex-end">
+  //     <ListItemAvatar>
+  //       <Avatar {...stringAvatar(message.user_name)} />
+  //       {/* <Avatar alt={message.user_name} src={message.avatar} /> */}
+  //     </ListItemAvatar>
+  //     <ListItemText
+  //       primary={`${message.user_name}`}
+  //       secondary={
+  //         <React.Fragment>
+  //           <Typography
+  //             sx={{ display: "inline" }}
+  //             component='span'
+  //             variant='body2'
+  //             color='text.primary'
+  //           >
+  //             {message.message}
+  //           </Typography>
+  //         </React.Fragment>
+  //       }
+  //     />
+  //     {message.user_id === currentUser.id ? (
+  //       <IconButton aria-label='delete' onClick={handleDeleteMessage}>
+  //         <DeleteIcon />
+  //       </IconButton>
+  //     ) : null}
+  //   </ListItem>
+  // );
+
 }
