@@ -51,7 +51,7 @@ module.exports = async (io, pool) => {
         // disconnect socket with joined channel
         socket.on("disconnect", () => {
           // leave channel
-          handleLeaveChannel(socket, joinMessage);
+          handleLeaveChannel(io, socket, joinMessage);
           console.log("disconnect");
           socket.disconnect();
         });
@@ -93,7 +93,7 @@ module.exports = async (io, pool) => {
 
       // Message: leave the channel
       socket.on(MESSAGE_TYPE.LEAVE_CHANNEL, (leaveMsg) => {
-        handleLeaveChannel(socket, leaveMsg);
+        handleLeaveChannel(io, socket, leaveMsg);
       });
     });
   } catch (err) {
@@ -126,15 +126,16 @@ function deleteUserFromUsers(user_id, channel_name) {
   console.log("left: ", users[channel_name]);
 }
 
-function handleLeaveChannel(socket, leaveMsg) {
+function handleLeaveChannel(io, socket, leaveMsg) {
   socket.leave(String(leaveMsg.channel_id));
   console.log("Server: leave the channel", socket.rooms);
 
   // Delete user from users
   deleteUserFromUsers(leaveMsg.user_id, leaveMsg.channel_name);
 
-  // Send updated channel users
-  socket.nsp.to(String(leaveMsg.channel_id)).emit(MESSAGE_TYPE.CHANNEL_USERS, {
+  // Send updated channel users to everyone
+  //socket.nsp.to(String(leaveMsg.channel_id)).emit(MESSAGE_TYPE.CHANNEL_USERS, {
+  io.emit(MESSAGE_TYPE.CHANNEL_USERS, {
     channels,
     users,
   });
