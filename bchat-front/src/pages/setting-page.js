@@ -167,130 +167,134 @@ export default function SettingPage() {
         alignItems: "center",
       }}
     >
-      <Card
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          maxWidth: 450,
-          p: 4,
-          pr: 6,
-          pl: 6,
-        }}
-      >
-        <Box
-          sx={{
-            width: "40%",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          {displayAvatar()}
-
-          <label for='input_avatar'>
-            <AddPhotoAlternateIcon sx={{ color: "blue", cursor: "pointer" }} />
-            <input
-              id='input_avatar'
-              style={{ display: "none" }}
-              type='file'
-              accept='image/gif, image/jpeg, image/png'
-              onChange={getAvatarFileInfo}
-            ></input>
-          </label>
-        </Box>
-        <Box
-          component='form'
-          noValidate
-          autoComplete='off'
+      {currentUser ? (
+        <Card
           sx={{
             display: "flex",
-            flexDirection: "column",
             alignItems: "center",
-            "& .MuiTextField-root": { m: 1, width: "25ch" },
+            maxWidth: 450,
+            p: 4,
+            pr: 6,
+            pl: 6,
           }}
         >
-          <CardContent>
-            <Typography gutterBottom variant='h5' component='div'>
-              USER SETTINGS
-            </Typography>
-            <CollapseAlert alertType={ALERT_TYPE.ERROR} isOpen={isError}>
-              {errorMessage}
-            </CollapseAlert>
+          <Box
+            sx={{
+              width: "40%",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            {displayAvatar()}
 
-            <FormControl sx={{ m: 1, width: "25ch" }} variant='outlined'>
-              <InputLabel>User Name</InputLabel>
-              <OutlinedInput
-                type='text'
-                name='user_name'
-                value={settingFormData.user_name}
-                onChange={handleFormChange}
+            <label for='input_avatar'>
+              <AddPhotoAlternateIcon
+                sx={{ color: "blue", cursor: "pointer" }}
               />
-            </FormControl>
+              <input
+                id='input_avatar'
+                style={{ display: "none" }}
+                type='file'
+                accept='image/gif, image/jpeg, image/png'
+                onChange={getAvatarFileInfo}
+              ></input>
+            </label>
+          </Box>
+          <Box
+            component='form'
+            noValidate
+            autoComplete='off'
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              "& .MuiTextField-root": { m: 1, width: "25ch" },
+            }}
+          >
+            <CardContent>
+              <Typography gutterBottom variant='h5' component='div'>
+                USER SETTINGS
+              </Typography>
+              <CollapseAlert alertType={ALERT_TYPE.ERROR} isOpen={isError}>
+                {errorMessage}
+              </CollapseAlert>
 
-            <TextField
-              required
-              name='email'
-              value={currentUser.email}
-              disabled
-            />
+              <FormControl sx={{ m: 1, width: "25ch" }} variant='outlined'>
+                <InputLabel>User Name</InputLabel>
+                <OutlinedInput
+                  type='text'
+                  name='user_name'
+                  value={settingFormData.user_name}
+                  onChange={handleFormChange}
+                />
+              </FormControl>
 
-            <FormControl sx={{ m: 1, width: "25ch" }} variant='outlined'>
-              <InputLabel htmlFor='outlined-adornment-password'>
-                Change Password
-              </InputLabel>
-              <OutlinedInput
-                id='outlined-adornment-password'
-                type={showPassword ? "text" : "password"}
-                endAdornment={
-                  <InputAdornment position='end'>
-                    <IconButton
-                      aria-label='toggle password visibility'
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge='end'
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-                name='pwd'
-                onChange={handleFormChange}
+              <TextField
+                required
+                name='email'
+                value={currentUser.email}
+                disabled
               />
-            </FormControl>
-            <FormControl sx={{ m: 1, width: "25ch" }} variant='outlined'>
-              <InputLabel htmlFor='outlined-adornment-password'>
-                Confirm Password
-              </InputLabel>
-              <OutlinedInput
-                id='outlined-adornment-password'
-                type={showPassword ? "text" : "password"}
-                endAdornment={
-                  <InputAdornment position='end'>
-                    <IconButton
-                      aria-label='toggle password visibility'
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge='end'
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                }
-                name='pwd2'
-                onChange={handleFormChange}
-              />
-            </FormControl>
-          </CardContent>
-          <CardActions>
-            <Button variant='contained' onClick={handleCancel}>
-              Cancel
-            </Button>
-            <Button variant='contained' onClick={handleUpdateSetting}>
-              Update
-            </Button>
-          </CardActions>
-        </Box>
-      </Card>
+
+              <FormControl sx={{ m: 1, width: "25ch" }} variant='outlined'>
+                <InputLabel htmlFor='outlined-adornment-password'>
+                  Change Password
+                </InputLabel>
+                <OutlinedInput
+                  id='outlined-adornment-password'
+                  type={showPassword ? "text" : "password"}
+                  endAdornment={
+                    <InputAdornment position='end'>
+                      <IconButton
+                        aria-label='toggle password visibility'
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge='end'
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                  name='pwd'
+                  onChange={handleFormChange}
+                />
+              </FormControl>
+              <FormControl sx={{ m: 1, width: "25ch" }} variant='outlined'>
+                <InputLabel htmlFor='outlined-adornment-password'>
+                  Confirm Password
+                </InputLabel>
+                <OutlinedInput
+                  id='outlined-adornment-password'
+                  type={showPassword ? "text" : "password"}
+                  endAdornment={
+                    <InputAdornment position='end'>
+                      <IconButton
+                        aria-label='toggle password visibility'
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge='end'
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                  name='pwd2'
+                  onChange={handleFormChange}
+                />
+              </FormControl>
+            </CardContent>
+            <CardActions>
+              <Button variant='contained' onClick={handleCancel}>
+                Cancel
+              </Button>
+              <Button variant='contained' onClick={handleUpdateSetting}>
+                Update
+              </Button>
+            </CardActions>
+          </Box>
+        </Card>
+      ) : null}
     </Box>
   );
 }
