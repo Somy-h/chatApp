@@ -46,8 +46,9 @@ export default function Channel() {
   };
 
   const channelList = () =>
-    channelUsers?.channels?.map((channel) => (
+    channelUsers?.channels?.map((channel, idx) => (
       <CollapseChannelItem
+        key={idx}
         currentChannelId={currentChannel?.channel_id}
         channel={channel}
         handleJoinChannel={handleJoinChannel}
