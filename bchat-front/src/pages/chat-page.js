@@ -29,34 +29,38 @@ export default function ChatPage() {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <CssBaseline />
-      <Box component='nav'>
-        <Channel />
-      </Box>
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          height: "90vh",
-        }}
-      >
-        {currentChannel?.channel_id ? (
-          <>
-            <Header />
-            <Box
-              component='main'
-              sx={{ flex: 1, py: 6, px: 4, bgcolor: "#eaeff1" }}
-            >
-              {displayMessages()}
-            </Box>
-            <Box component='footer' sx={{ p: 2, bgcolor: "#eaeff1" }}>
-              <InputMessage sendMessage={handleSendMessage} />
-            </Box>
-          </>
-        ) : null}
-      </Box>
-    </Box>
+    <>
+      {currentUser ? (
+        <Box sx={{ display: "flex" }}>
+          <CssBaseline />
+          <Box component='nav'>
+            <Channel />
+          </Box>
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              height: "90vh",
+            }}
+          >
+            {currentChannel?.channel_id ? (
+              <>
+                <Header />
+                <Box
+                  component='main'
+                  sx={{ flex: 1, py: 6, px: 4, bgcolor: "#eaeff1" }}
+                >
+                  {displayMessages()}
+                </Box>
+                <Box component='footer' sx={{ p: 2, bgcolor: "#eaeff1" }}>
+                  <InputMessage sendMessage={handleSendMessage} />
+                </Box>
+              </>
+            ) : null}
+          </Box>
+        </Box>
+      ) : null}
+    </>
   );
 }
