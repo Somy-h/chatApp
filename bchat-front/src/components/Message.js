@@ -33,7 +33,7 @@ export default function Message(prop) {
       messageLayout: {
         margin: "0px 0px 8px 0px",
         width: "60%",
-        backgroundColor: "#006AFF",
+        backgroundColor: "#69A8FF",
         padding: 1
       }
     }
@@ -47,7 +47,7 @@ export default function Message(prop) {
       messageLayout: {
         margin: "0px 0px 8px 0px",
         width: "60%",
-        backgroundColor: "#00B2FF",
+        backgroundColor: "#70D4FF",
         padding: 1
       }
     }
