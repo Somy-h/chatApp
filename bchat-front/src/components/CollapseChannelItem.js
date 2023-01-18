@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { SocketContext } from "../context/socket.context";
+import { stringAvatar } from "../utils/utils";
 
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -98,7 +99,14 @@ export default function CollapseChannelItem({
           {channelUsers.users[channel.channel_name].map((user) => (
             <ListItem key={user.id} dense>
               <ListItemAvatar>
-                <Avatar src={user.avatar} sx={{ width: 14, height: 14 }} />
+                {user.avatar === null ? (
+                  <Avatar
+                    {...stringAvatar(user.user_name)}
+                    sx={{ width: 14, height: 14 }}
+                  />
+                ) : (
+                  <Avatar src={user.avatar} sx={{ width: 14, height: 14 }} />
+                )}
               </ListItemAvatar>
               <ListItemText secondary={user.user_name} />
             </ListItem>
