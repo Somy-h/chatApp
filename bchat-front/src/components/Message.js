@@ -2,7 +2,7 @@ import React from "react";
 import { useContext } from "react";
 import { UserContext } from "../context/user.context";
 import { SocketContext } from "../context/socket.context";
-import { stringAvatar } from "../utils/utils";
+import { stringLargeAvatar } from "../utils/utils";
 
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
@@ -42,7 +42,6 @@ export default function Message(prop) {
       messageLayout: {
         margin: "0px 0px 8px 0px",
         width: "60%",
-        border: "solid 1px red",
         backgroundColor: "#006AFF",
         padding: 1
       }
@@ -57,7 +56,6 @@ export default function Message(prop) {
       messageLayout: {
         margin: "0px 0px 8px 0px",
         width: "60%",
-        border: "solid 1px red",
         backgroundColor: "#00B2FF",
         padding: 1
       }
@@ -66,16 +64,16 @@ export default function Message(prop) {
 
   return(
     <Box sx={messageType.messageOrientation}>
-      <Paper variant="outlined" elevation={3} sx={messageType.messageLayout}> 
-        <Grid container direction="row" alignItems="flex-start" spacing={2}>
+      <Paper elevation={7} sx={messageType.messageLayout}> 
+        <Grid container direction="row" alignItems="flex-start" justifyContent="space-between">
           {/* avatar grid */}
           <Grid item xs="auto">
             {message.avatar === null ? (
-                <Avatar {...stringAvatar(message.user_name)} />
-              ) : <Avatar alt={message.user_name} src={message.avatar} />}
+                <Avatar {...stringLargeAvatar(message.user_name)} />
+              ) : <Avatar sx={{width: 45, height: 45 }} alt={message.user_name} src={message.avatar} />}
           </Grid>
           {/* user time and message container */}
-          <Grid item xs={9}>
+          <Grid item xs={10}>
             <Grid container>
               {/* name and date container */}
               <Grid xs={12}>
@@ -104,7 +102,7 @@ export default function Message(prop) {
           {/* user delete message button grid*/}
           <Grid item xs="auto" direction="row" justifyContent="flex-end" alignItems="flex-start">
             {message.user_id === currentUser.id ? (
-                <IconButton sx={{margin: 0, padding: 0, display: 'flex', alignSelf: 'flex-start'}} aria-label='delete' onClick={handleDeleteMessage}>
+                <IconButton sx={{margin: 0, padding: 0, display: 'flex', alignSelf: 'flex-end'}} aria-label='delete' onClick={handleDeleteMessage}>
                   <DeleteIcon />
                 </IconButton>
               ) : null}
