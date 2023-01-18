@@ -47,7 +47,7 @@ export default function ChatPage() {
             <Header />
             <Box
               component='main'
-              sx={{ flex: 1, py: 6, px: 4, bgcolor: "#eaeff1" }}
+              sx={{ flex: 1, py: 6, px: 4, bgcolor: "#eaeff1", "overflow-x": "hidden"}}
             >
               {displayMessages()}
             </Box>
