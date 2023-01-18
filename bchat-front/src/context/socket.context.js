@@ -1,4 +1,6 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
+import { UserContext } from "./user.context";
+import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 
 export const MESSAGE_TYPE = {
@@ -19,6 +21,8 @@ export const SocketContext = createContext(socket);
 export const SocketProvider = ({ children }) => {
   const [channelUsers, setChannelUsers] = useState(null);
   const [channelMessages, setChannelMessages] = useState([]);
+  const { setCurrentUser, setCurrentChannel, currentUser, currentChannel } =
+    useContext(UserContext);
 
   const handleReceiveMessage = (message) => {
     //console.log("Received message", message);
@@ -41,10 +45,21 @@ export const SocketProvider = ({ children }) => {
     }
   };
 
+  const handleDisconnectFromServer = () => {
+    //console.log("disconnecting from server");
+    setCurrentUser(null);
+    setCurrentChannel(null);
+    console.log(currentUser, currentChannel);
+    alert("Server disconnected. Try again later.");
+  };
+
   useEffect(() => {
     socket.on(MESSAGE_TYPE.JOIN_CHANNEL, handleChannelMessages);
+    socket.on("disconnect", handleDisconnectFromServer);
+
     return () => {
       socket.off(MESSAGE_TYPE.JOIN_CHANNEL, handleChannelMessages);
+      socket.off("disconnect", handleDisconnectFromServer);
     };
   }, []);
 
