@@ -18,15 +18,44 @@ const stringToColor = (string) => {
   return color;
 };
 
+const initializeName = (name) => {
+  return name.split(" ").length > 1
+    ? `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`
+    : `${name.split(" ")[0][0]}`;
+};
+
 export const stringAvatar = (name) => {
   if (!name || name === "") name = "N A";
   return {
     sx: {
       bgcolor: stringToColor(name),
     },
-    children:
-      name.split(" ").length > 1
-        ? `${name.split(" ")[0][0]}${name.split(" ")[1][0]}`
-        : `${name.split(" ")[0][0]}`,
+    children: initializeName(name),
+  };
+};
+
+export const stringSmallAvatar = (name) => {
+  if (!name || name === "") name = "N A";
+  return {
+    sx: {
+      bgcolor: stringToColor(name),
+      fontSize: 12,
+      width: 16,
+      height: 16,
+    },
+    children: initializeName(name),
+  };
+};
+
+export const stringLargeAvatar = (name) => {
+  if (!name || name === "") name = "N A";
+  return {
+    sx: {
+      bgcolor: stringToColor(name),
+      fontSize: 24,
+      width: 45,
+      height: 45,
+    },
+    children: initializeName(name),
   };
 };
