@@ -111,7 +111,7 @@ function handleJoinChannel(socket, joinMsg) {
     user_name: joinMsg.user_name,
     avatar: joinMsg.avatar,
   });
-  console.log("joined: ", users, users[joinMsg.channel_name]);
+  console.log("joined: ", users);
   // Send updated channel users
   socket.nsp.to(String(joinMsg.channel_id)).emit(MESSAGE_TYPE.CHANNEL_USERS, {
     channels,
@@ -123,12 +123,12 @@ function deleteUserFromUsers(user_id, channel_name) {
   users[channel_name] = users[channel_name].filter(
     (user) => user.user_id !== user_id
   );
-  console.log("left: ", users[channel_name]);
+  //console.log("left: ", users[channel_name]);
 }
 
 function handleLeaveChannel(io, socket, leaveMsg) {
   socket.leave(String(leaveMsg.channel_id));
-  console.log("Server: leave the channel", socket.rooms);
+  //console.log("Server: leave the channel", socket.rooms);
 
   // Delete user from users
   deleteUserFromUsers(leaveMsg.user_id, leaveMsg.channel_name);
