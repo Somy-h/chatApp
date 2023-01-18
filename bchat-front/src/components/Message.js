@@ -12,8 +12,9 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
-
+import { blue, cyan } from "@mui/material/colors";
 
 export default function Message(prop) {
   const { message } = prop;
@@ -33,118 +34,83 @@ export default function Message(prop) {
   let messageType = {} ;
   (message.user_id === currentUser.id) ? (
     messageType = {
-      messageOrientation: "flex-end",
+      messageOrientation: {
+        width: '100%', 
+        display: 'flex', 
+        justifyContent: 'flex-end'
+      },
       messageLayout: {
-        backgroundColor: 'primary.dark'
+        margin: "0px 0px 8px 0px",
+        width: "60%",
+        border: "solid 1px red",
+        backgroundColor: "#006AFF",
+        padding: 1
       }
     }
   ) : (
     messageType = {
-      messageOrientation: "flex-start",
+      messageOrientation: {
+        width: '100%', 
+        display: 'flex', 
+        justifyContent: 'flex-start'
+      },
       messageLayout: {
-        backgroundColor: 'primary.main'
+        margin: "0px 0px 8px 0px",
+        width: "60%",
+        border: "solid 1px red",
+        backgroundColor: "#00B2FF",
+        padding: 1
       }
     }
   )
 
-
   return(
-    <Box component="span" sx={`${messageType.messageLayout}`}> 
-      <Grid container direction="row" alignItems="flex-start" justifyContent={messageType.messageOrientation} spacing={2}>
-        {/* avatar grid */}
-        <Grid item xs="auto">
-          {message.avatar === null ? (
-              <Avatar {...stringAvatar(message.user_name)} />
-            ) : <Avatar alt={message.user_name} src={message.avatar} />}
-        </Grid>
-        {/* user time and message container */}
-        <Grid item xs={5}>
-          <Grid container>
-            {/* name and date container */}
-            <Grid xs={12}>
-              <Grid container direction="row" justifyContent="flex-start" alignItems="flex-start" spacing={5}>
-                <Grid item xs="auto">
-                  <Typography variant="h6">{message.user_name}</Typography>
-                </Grid>
-                <Grid item xs="auto">
-                <Typography variant="subtitle2">{messageTimestamp}</Typography>
+    <Box sx={messageType.messageOrientation}>
+      <Paper variant="outlined" elevation={3} sx={messageType.messageLayout}> 
+        <Grid container direction="row" alignItems="flex-start" spacing={2}>
+          {/* avatar grid */}
+          <Grid item xs="auto">
+            {message.avatar === null ? (
+                <Avatar {...stringAvatar(message.user_name)} />
+              ) : <Avatar alt={message.user_name} src={message.avatar} />}
+          </Grid>
+          {/* user time and message container */}
+          <Grid item xs={9}>
+            <Grid container>
+              {/* name and date container */}
+              <Grid xs={12}>
+                <Grid container direction="row" justifyContent="flex-start" alignItems="flex-start" spacing={5}>
+                  <Grid item xs="auto">
+                    <Typography variant="h6">{message.user_name}</Typography>
+                  </Grid>
+                  <Grid item xs="auto">
+                  <Typography variant="subtitle2">{messageTimestamp}</Typography>
+                  </Grid>
                 </Grid>
               </Grid>
-            </Grid>
-            {/* message grid */}
-            <Grid item xs={12}>
-              <Typography
-                sx={{ display: "inline" }}
-                component='span'
-                variant='body2'
-                color='text.primary'
-              >
-                {message.message}
-              </Typography>
+              {/* message grid */}
+              <Grid item xs={12}>
+                <Typography
+                  sx={{ display: "inline" }}
+                  component='span'
+                  variant='body2'
+                  color='text.primary'
+                >
+                  {message.message}
+                </Typography>
+              </Grid>
             </Grid>
           </Grid>
+          {/* user delete message button grid*/}
+          <Grid item xs="auto" direction="row" justifyContent="flex-end" alignItems="flex-start">
+            {message.user_id === currentUser.id ? (
+                <IconButton sx={{margin: 0, padding: 0, display: 'flex', alignSelf: 'flex-start'}} aria-label='delete' onClick={handleDeleteMessage}>
+                  <DeleteIcon />
+                </IconButton>
+              ) : null}
+          </Grid>
         </Grid>
-        {/* user delete message button grid*/}
-        <Grid item xs="auto">
-          {message.user_id === currentUser.id ? (
-              <IconButton aria-label='delete' onClick={handleDeleteMessage}>
-                <DeleteIcon />
-              </IconButton>
-            ) : null}
-        </Grid>
-      </Grid>
-    </Box> 
+      </Paper>
+    </Box>
   );
-
-  //   <ListItem alignItems="flex-end">
-  //     <ListItemText
-  //       primary={`${message.user_name}`}
-  //       secondary={
-  //         <React.Fragment>
-  //           <Typography
-  //             sx={{ display: "inline" }}
-  //             component='span'
-  //             variant='body2'
-  //             color='text.primary'
-  //           >
-  //             {message.time}
-  //           </Typography>
-  //         </React.Fragment>
-  //       }
-  //     />
-  //   </ListItem>
-
-
-
-
-  //original
-  // return (
-  //   <ListItem alignItems="flex-end">
-  //     <ListItemAvatar>
-  //       <Avatar {...stringAvatar(message.user_name)} />
-  //       {/* <Avatar alt={message.user_name} src={message.avatar} /> */}
-  //     </ListItemAvatar>
-  //     <ListItemText
-  //       primary={`${message.user_name}`}
-  //       secondary={
-  //         <React.Fragment>
-  //           <Typography
-  //             sx={{ display: "inline" }}
-  //             component='span'
-  //             variant='body2'
-  //             color='text.primary'
-  //           >
-  //             {message.message}
-  //           </Typography>
-  //         </React.Fragment>
-  //       }
-  //     />
-  //     {message.user_id === currentUser.id ? (
-  //       <IconButton aria-label='delete' onClick={handleDeleteMessage}>
-  //         <DeleteIcon />
-  //       </IconButton>
-  //     ) : null}
-  //   </ListItem>
-  // );
-
 }
