@@ -2,6 +2,7 @@ import { React, Fragment } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { UserContext } from "../context/user.context";
+import { SocketContext } from "../context/socket.context";
 import { removeJwt } from "../ApiServices/jwtService";
 
 import AppBar from "@mui/material/AppBar";
@@ -12,7 +13,10 @@ import SettingsIcon from "@mui/icons-material/Settings";
 
 export default function Menu() {
   let navigate = useNavigate();
-  const { currentUser, setCurrentUser } = useContext(UserContext);
+  const { currentUser, setCurrentUser, currentChannel, setCurrentChannel } =
+    useContext(UserContext);
+
+  const { leaveChannel } = useContext(SocketContext);
 
   const routeToHomePage = () => {
     navigate("/");
@@ -31,8 +35,19 @@ export default function Menu() {
   };
 
   const handleLogout = () => {
+    if (currentChannel) {
+      const leaveMsg = {
+        channel_id: currentChannel.channel_id,
+        channel_name: currentChannel.channel_name,
+        user_id: currentUser.id,
+        user_name: currentUser.user_name,
+      };
+      leaveChannel(leaveMsg);
+    }
+
     removeJwt();
     setCurrentUser(null);
+    setCurrentChannel(null);
     navigate("/login");
   };
 
