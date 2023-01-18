@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { SocketContext } from "../context/socket.context";
+import { stringAvatar } from "../utils/utils";
 
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -14,20 +15,20 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import LoginIcon from "@mui/icons-material/Login";
 import Collapse from "@mui/material/Collapse";
 import Avatar from "@mui/material/Avatar";
-import Chip from "@mui/material/Chip";
 
 export default function CollapseChannelItem({
   currentChannelId,
   channel,
   handleJoinChannel,
 }) {
-  const { channelUsers } = useContext(SocketContext);
+  const { channelUsers, getChannelUsers } = useContext(SocketContext);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleExpand = (e) => {
     setIsCollapsed((prev) => !prev);
     e.stopPropagation();
+    getChannelUsers();
   };
 
   const onClickJoinChannel = () => {
@@ -98,7 +99,14 @@ export default function CollapseChannelItem({
           {channelUsers.users[channel.channel_name].map((user) => (
             <ListItem key={user.id} dense>
               <ListItemAvatar>
-                <Avatar src={user.avatar} sx={{ width: 14, height: 14 }} />
+                {user.avatar === null ? (
+                  <Avatar
+                    {...stringAvatar(user.user_name)}
+                    sx={{ width: 14, height: 14 }}
+                  />
+                ) : (
+                  <Avatar src={user.avatar} sx={{ width: 14, height: 14 }} />
+                )}
               </ListItemAvatar>
               <ListItemText secondary={user.user_name} />
             </ListItem>
