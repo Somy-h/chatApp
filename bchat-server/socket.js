@@ -20,10 +20,10 @@ module.exports = async (io, pool) => {
 
       // Message: Get user list in channel
       socket.on(MESSAGE_TYPE.CHANNEL_USERS, () => {
-        console.log("get users from channel# with users");
+        console.log("get users from channel# with users", users);
 
         // Only to the sender
-        console.log(users);
+        //console.log(users);
         socket.emit(MESSAGE_TYPE.CHANNEL_USERS, {
           channels,
           users,
@@ -65,17 +65,11 @@ module.exports = async (io, pool) => {
         // Insert message into DB
         insertMessageIntoDB(pool, message).then((msgId) => {
           fetchMessageFromDB(pool, msgId).then((newMsg) => {
-            const msg = {
-              ...message,
-              id: msgId,
-              time: newMsg.time,
-            };
-
             console.log("send to client new message ID: ", msgId, socket.rooms);
-            console.dir(msg);
+            console.dir(newMsg);
             socket.nsp
-              .to(String(msg.channel_id))
-              .emit(MESSAGE_TYPE.RECEIVE_MESSAGE, msg);
+              .to(String(newMsg.channel_id))
+              .emit(MESSAGE_TYPE.RECEIVE_MESSAGE, newMsg);
           });
         });
       });
@@ -107,28 +101,29 @@ module.exports = async (io, pool) => {
   }
 };
 
-function deleteUserFromUsers(user_id, channel_name) {
-  users[channel_name] = users[channel_name].filter(
-    (user) => user.user_id !== user_id
-  );
-}
-
 function handleJoinChannel(socket, joinMsg) {
   socket.join(String(joinMsg.channel_id));
 
   // Add user into users
-  console.log(joinMsg.channel_name, users, users[joinMsg.channel_name]);
+
   users[joinMsg.channel_name].push({
     user_id: joinMsg.user_id,
     user_name: joinMsg.user_name,
     avatar: joinMsg.avatar,
   });
-
+  console.log("joined: ", users, users[joinMsg.channel_name]);
   // Send updated channel users
   socket.nsp.to(String(joinMsg.channel_id)).emit(MESSAGE_TYPE.CHANNEL_USERS, {
     channels,
     users,
   });
+}
+
+function deleteUserFromUsers(user_id, channel_name) {
+  users[channel_name] = users[channel_name].filter(
+    (user) => user.user_id !== user_id
+  );
+  console.log("left: ", users[channel_name]);
 }
 
 function handleLeaveChannel(socket, leaveMsg) {
@@ -167,13 +162,10 @@ async function getChannelMessagesFromDB(pool, channelId) {
     const result = await pool.query(`
     SELECT m.id, m.channel_id, c.channel_name, m.user_id, u.user_name, u.avatar, m.message, m.time, m.inactive
     FROM messages AS m
-    INNER JOIN channels AS c ON m.channel_id = c.id
-    INNER JOIN users AS u ON m.user_id = u.id
+      INNER JOIN channels AS c ON m.channel_id = c.id
+      INNER JOIN users AS u ON m.user_id = u.id
     WHERE m.channel_id = ${channelId} AND m.inactive = 0
-    LIMIT 100`);
-
-    console.log(result[0]);
-    //const channelMessages = result[0];
+    LIMIT 500`);
 
     return result[0];
   } catch (err) {
@@ -223,9 +215,11 @@ async function updateInactiveMessageFromDB(pool, messageId) {
 async function fetchMessageFromDB(pool, messageId) {
   try {
     const [[message]] = await pool.query(`
-      SELECT *
-      FROM messages
-      WHERE id = ${messageId}`);
+    SELECT  m.id, m.channel_id, c.channel_name, m.user_id, u.user_name, u.avatar, m.message, m.time, m.inactive
+    FROM messages AS m
+      INNER JOIN channels AS c ON m.channel_id = c.id
+      INNER JOIN users AS u ON m.user_id = u.id
+    WHERE m.id = ${messageId} `);
     console.log("DB returned: ", message);
     return message;
   } catch (err) {
