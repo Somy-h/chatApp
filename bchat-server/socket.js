@@ -66,8 +66,9 @@ module.exports = async (io, pool) => {
         insertMessageIntoDB(pool, message).then((msgId) => {
           fetchMessageFromDB(pool, msgId).then((newMsg) => {
             const msg = {
-              ...newMsg,
+              ...message,
               id: msgId,
+              time: newMsg.time,
             };
 
             console.log("send to client new message ID: ", msgId, socket.rooms);
