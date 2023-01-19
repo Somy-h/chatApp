@@ -2,19 +2,10 @@ import React from "react";
 import { useContext } from "react";
 import { UserContext } from "../context/user.context";
 import { SocketContext } from "../context/socket.context";
-import { stringAvatar } from "../utils/utils";
+import { stringLargeAvatar } from "../utils/utils";
 
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import Avatar from "@mui/material/Avatar";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
-import Box from '@mui/material/Box';
-import { blue, cyan } from "@mui/material/colors";
+import { Hidden, Box, Paper, Grid, Typography, Avatar, IconButton, List, ListItem, ListItemText, ListItemAvatar } from "@mui/material";
 
 export default function Message(prop) {
   const { message } = prop;
@@ -42,8 +33,7 @@ export default function Message(prop) {
       messageLayout: {
         margin: "0px 0px 8px 0px",
         width: "60%",
-        border: "solid 1px red",
-        backgroundColor: "#006AFF",
+        backgroundColor: "#69A8FF",
         padding: 1
       }
     }
@@ -57,8 +47,7 @@ export default function Message(prop) {
       messageLayout: {
         margin: "0px 0px 8px 0px",
         width: "60%",
-        border: "solid 1px red",
-        backgroundColor: "#00B2FF",
+        backgroundColor: "#70D4FF",
         padding: 1
       }
     }
@@ -66,48 +55,86 @@ export default function Message(prop) {
 
   return(
     <Box sx={messageType.messageOrientation}>
-      <Paper variant="outlined" elevation={3} sx={messageType.messageLayout}> 
-        <Grid container direction="row" alignItems="flex-start" spacing={2}>
-          {/* avatar grid */}
-          <Grid item xs="auto">
-            {message.avatar === null ? (
-                <Avatar {...stringAvatar(message.user_name)} />
-              ) : <Avatar alt={message.user_name} src={message.avatar} />}
-          </Grid>
-          {/* user time and message container */}
-          <Grid item xs={9}>
-            <Grid container>
-              {/* name and date container */}
-              <Grid xs={12}>
-                <Grid container direction="row" justifyContent="flex-start" alignItems="flex-start" spacing={5}>
-                  <Grid item xs="auto">
-                    <Typography variant="h6">{message.user_name}</Typography>
-                  </Grid>
-                  <Grid item xs="auto">
-                  <Typography variant="subtitle2">{messageTimestamp}</Typography>
+      <Paper elevation={7} sx={messageType.messageLayout}> 
+        <Grid container direction="row" alignItems="flex-start" justifyContent="space-between">
+          <Grid container direction="row" alignItems="flex-start" justifyContent="space-between">
+            <Grid item xs="11">
+              <Grid container direction="row" alignItems="flex-start" spacing={1}>
+                {/* avatar grid */}
+                <Grid item xs="auto">
+                  {message.avatar === null ? (
+                      <Avatar {...stringLargeAvatar(message.user_name)} />
+                    ) : <Avatar sx={{width: 45, height: 45 }} alt={message.user_name} src={message.avatar} />}
+                </Grid>
+                {/* user time and message container */}
+                <Grid item xs={10}>
+                  <Grid container>
+                    {/* name and date container */}
+                    <Grid item xs={12}>
+                      {/* HERE HERE HERE HERE */}
+                        <Grid container direction="row" justifyContent="flex-start" alignItems="flex-start" spacing={5} display={{ xs: 'none', lg: 'flex'}}>
+                          <Grid item xs="auto">
+                            <Typography variant="h6">{message.user_name}</Typography>
+                          </Grid>
+                          <Grid item xs="auto">
+                          <Typography variant="subtitle2">{messageTimestamp}</Typography>
+                          </Grid>
+                        </Grid>
+                        <ListItem alignItems='flex-start' display={{xs:'block', lg:'none'}} sx={{padding:0}}>
+                          <ListItemText 
+                            primary={
+                              <React.Fragment>
+                                <Typography
+                                  display={{xs:'block', lg:'none'}}
+                                  component='span'
+                                  variant='h6'
+                                  color='text.primary'
+                                >
+                                  {message.user_name}
+                                </Typography>
+                              </React.Fragment>
+                            }
+                            secondary={
+                              <React.Fragment>
+                                <Typography
+                                  display={{xs:'block', lg:'none'}}
+                                  component='span'
+                                  variant='body2'
+                                  color='text.primary'
+                                >
+                                  {messageTimestamp}
+                                </Typography>
+                              </React.Fragment>
+                            }
+                          />
+                        </ListItem>
+                      {/* HERE HERE HERE HERE */}
+                    </Grid>
+                    {/* message grid */}
+                    <Grid item xs={12}>
+                      <Typography
+                        sx={{ display: "inline" }}
+                        component='span'
+                        variant='body2'
+                        color='text.primary'
+                      >
+                        {message.message}
+                      </Typography>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
-              {/* message grid */}
-              <Grid item xs={12}>
-                <Typography
-                  sx={{ display: "inline" }}
-                  component='span'
-                  variant='body2'
-                  color='text.primary'
-                >
-                  {message.message}
-                </Typography>
+            </Grid>
+            <Grid item xs="auto">  
+              {/* user delete message button grid*/}
+              <Grid item xs="auto" direction="row" justifyContent="flex-end" alignItems="flex-start">
+                {message.user_id === currentUser.id ? (
+                    <IconButton sx={{margin: 0, padding: 0, display: 'flex', alignSelf: 'flex-end'}} aria-label='delete' onClick={handleDeleteMessage}>
+                      <DeleteIcon />
+                    </IconButton>
+                  ) : null}
               </Grid>
             </Grid>
-          </Grid>
-          {/* user delete message button grid*/}
-          <Grid item xs="auto" direction="row" justifyContent="flex-end" alignItems="flex-start">
-            {message.user_id === currentUser.id ? (
-                <IconButton sx={{margin: 0, padding: 0, display: 'flex', alignSelf: 'flex-start'}} aria-label='delete' onClick={handleDeleteMessage}>
-                  <DeleteIcon />
-                </IconButton>
-              ) : null}
           </Grid>
         </Grid>
       </Paper>
