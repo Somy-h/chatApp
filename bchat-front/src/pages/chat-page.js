@@ -1,4 +1,4 @@
-import { useContext, useRef, useEffect } from "react";
+import { useContext, useRef, useEffect, useCallback, useState } from "react";
 import { UserContext } from "../context/user.context";
 import { SocketContext } from "../context/socket.context";
 
@@ -13,21 +13,66 @@ export default function ChatPage() {
   const { currentUser, currentChannel } = useContext(UserContext);
   const { channelMessages, sendMessage } = useContext(SocketContext);
 
-  // creates ref housed in hidden div at bottom of chat stream
-  let messageStreamEnd = useRef();
+  //START OF CALLBACK REF
 
-  //smoothly scrolls to bottom of chat stream
-  const scrollToBottom = () => {
+  // const useHookWithRefCallback = () => {
+  //   const messageStreamEnd = useRef(null)
+  //   const setRef = useCallback(node => {
+  //     if (messageStreamEnd.current) {
+  //       // Make sure to cleanup any events/references added to the last instance
+  //       messageStreamEnd.scrollIntoView({behavior: "smooth"})
+  //     }
+      
+  //     if (node) {
+  //       // Check if a node is actually passed. Otherwise node would be null.
+  //       // You can now do what you need to, addEventListeners, measure, etc.
+
+  //     }
+      
+  //     // Save a reference to the node
+  //     messageStreamEnd.current = node
+  //   }, [])
+    
+  //   return [setRef]
+  // }
+  
+  // function Component() {
+  //   // In your component you'll still recieve a `ref`, but it 
+  //   // will be a callback function instead of a Ref Object
+  //   const [messageStreamEnd] = useHookWithRefCallback()
+    
+  //   return <div ref={messageStreamEnd}>Ref element</div>
+  // }
+
+
+  // //END OF CALLBACK REF
+  
+  const [messageID, setMessageID] = useState(0);
+
+  const handleNewMessage = (newID) => {
+    setMessageID(newID);
+  }
+  
+  
+  // ref used to scroll to the bottom of message stream
+  let messageStreamEnd = useRef(null);
+
+  const scrollToBottom = (behavior) => {
     messageStreamEnd.scrollIntoView({behavior: "smooth"})
   }
   
-  //scrolls to bottom of message stream when page component is rendered
+  //checks if currently in a channel then scrolls to bottom whenever last rendered message has a different ID
+  //ISSUE: currently activates scrollToBottom() when the last message in a stream is updated.
   useEffect(() => {
-    scrollToBottom();
-  });
+    if (currentChannel) {
+      scrollToBottom();
+    };
+  }, [messageID]);
+
+
 
   const displayMessages = () =>
-    channelMessages?.map((msg) => <Message key={msg.id} message={msg} />);
+    channelMessages?.map((msg) => <Message key={msg.id} message={msg} handleNewMessage={handleNewMessage} />);
 
   const handleSendMessage = (messageText) => {
     const sendMsg = {
@@ -75,4 +120,4 @@ export default function ChatPage() {
       </Box>
     </Box>
   );
-}
+};
