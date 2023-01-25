@@ -126,12 +126,14 @@ export default function Message(prop) {
             </Grid>
             <Grid item xs="auto">  
               {/* user delete message button grid*/}
-              <Grid item xs="auto" direction="row" justifyContent="flex-end" alignItems="flex-start">
-                {message.user_id === currentUser.id ? (
-                    <IconButton sx={{margin: 0, padding: 0, display: 'flex', alignSelf: 'flex-end'}} aria-label='delete' onClick={handleDeleteMessage}>
-                      <DeleteIcon />
-                    </IconButton>
-                  ) : null}
+              <Grid container direction="row" justifyContent="flex-end" alignItems="flex-start">
+                <Grid item xs="auto" >
+                  {message.user_id === currentUser.id ? (
+                      <IconButton sx={{margin: 0, padding: 0, display: 'flex', alignSelf: 'flex-end'}} aria-label='delete' onClick={handleDeleteMessage}>
+                        <DeleteIcon />
+                      </IconButton>
+                    ) : null}
+                </Grid>
               </Grid>
             </Grid>
           </Grid>
