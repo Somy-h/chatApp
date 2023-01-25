@@ -21,6 +21,16 @@ export default function InputMessage(props) {
     
   }
 
+  //checks for enter key press for submit
+  const handleEnterSubmit = (event) => {
+    if (event.key === 'Enter') {
+      handleSendMessage();
+      event.preventDefault();
+    }
+  }
+
+
+
   return (
     <Box display='flex' sx={{ width: "90%" }}>
       {/* <input
@@ -36,6 +46,7 @@ export default function InputMessage(props) {
         label='write message'
         id='inputMessage'
         name='message'
+        onKeyDown={handleEnterSubmit}
         onChange={handleMessageInputChange}
         value={sendingMessage}
       />
