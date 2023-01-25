@@ -13,6 +13,14 @@ export default function InputMessage(props) {
     setSendingMessage(value);
   };
 
+  //sends message and resets input field
+  const handleSendMessage = () => {
+    props.sendMessage(sendingMessage);
+    //resets input field
+    setSendingMessage("");
+    
+  }
+
   return (
     <Box display='flex' sx={{ width: "90%" }}>
       {/* <input
@@ -22,18 +30,20 @@ export default function InputMessage(props) {
         name='message'
         onChange={handleMessageInputChange}
       /> */}
+      
       <TextField
         fullWidth
         label='write message'
         id='inputMessage'
         name='message'
         onChange={handleMessageInputChange}
+        value={sendingMessage}
       />
       <Button
         variant='outlined'
         sx={{ m: 1 }}
         endIcon={<SendIcon />}
-        onClick={() => props.sendMessage(sendingMessage)}
+        onClick={handleSendMessage}
       >
         SEND
       </Button>
