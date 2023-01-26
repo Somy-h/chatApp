@@ -4,3 +4,4 @@ bchat-front/node_modules
 
 bchat-server/node_modules
 bchat-server/.env
+bchat-server/public/images/avatar

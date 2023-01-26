@@ -8,10 +8,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { Hidden, Box, Paper, Grid, Typography, Avatar, IconButton, List, ListItem, ListItemText, ListItemAvatar } from "@mui/material";
 
 export default function Message(prop) {
-  const { message } = prop;
+  const { message, handleNewMessage } = prop;
   const { currentUser } = useContext(UserContext);
   const { deleteMessage } = useContext(SocketContext);
 
+  //update parent state with last message ID
+  handleNewMessage(message.id);
+  
   const handleDeleteMessage = () => {
     //Context Library- deleteMessage
     deleteMessage(message.channel_id, message.id);
@@ -126,12 +129,14 @@ export default function Message(prop) {
             </Grid>
             <Grid item xs="auto">  
               {/* user delete message button grid*/}
-              <Grid item xs="auto" direction="row" justifyContent="flex-end" alignItems="flex-start">
-                {message.user_id === currentUser.id ? (
-                    <IconButton sx={{margin: 0, padding: 0, display: 'flex', alignSelf: 'flex-end'}} aria-label='delete' onClick={handleDeleteMessage}>
-                      <DeleteIcon />
-                    </IconButton>
-                  ) : null}
+              <Grid container direction="row" justifyContent="flex-end" alignItems="flex-start">
+                <Grid item xs="auto" >
+                  {message.user_id === currentUser.id ? (
+                      <IconButton sx={{margin: 0, padding: 0, display: 'flex', alignSelf: 'flex-end'}} aria-label='delete' onClick={handleDeleteMessage}>
+                        <DeleteIcon />
+                      </IconButton>
+                    ) : null}
+                </Grid>
               </Grid>
             </Grid>
           </Grid>
