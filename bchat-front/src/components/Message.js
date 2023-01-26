@@ -108,7 +108,6 @@ export default function Message(prop) {
                             }
                           />
                         </ListItem>
-                      {/* HERE HERE HERE HERE */}
                     </Grid>
                     {/* message grid */}
                     <Grid item xs={12}>
