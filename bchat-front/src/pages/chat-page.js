@@ -48,6 +48,7 @@ export default function ChatPage() {
   // //END OF CALLBACK REF
   
   const [messageID, setMessageID] = useState(0);
+  const [selectedChannel, setSelectedChannel] = useState("")
 
   const handleNewMessage = (newID) => {
     setMessageID(newID);
@@ -57,17 +58,25 @@ export default function ChatPage() {
   // ref used to scroll to the bottom of message stream
   let messageStreamEnd = useRef(null);
 
-  const scrollToBottom = (behavior) => {
-    messageStreamEnd.scrollIntoView({behavior: "smooth"})
+  const scrollToBottom = (scrollBehavior) => {
+    messageStreamEnd.scrollIntoView({behavior: scrollBehavior})
   }
   
   //checks if currently in a channel then scrolls to bottom whenever last rendered message has a different ID
   //ISSUE: currently activates scrollToBottom() when the last message in a stream is updated.
+  //
   useEffect(() => {
     if (currentChannel) {
-      scrollToBottom();
+      console.log(currentChannel.channel_id);
+      scrollToBottom("smooth");
     };
   }, [messageID]);
+
+  useEffect(() => {
+    if (currentChannel) {
+      scrollToBottom("auto");
+    }
+  }, [currentChannel])
 
 
 

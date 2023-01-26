@@ -11,7 +11,6 @@ export default function Message(prop) {
   const { message, handleNewMessage } = prop;
   const { currentUser } = useContext(UserContext);
   const { deleteMessage } = useContext(SocketContext);
-  console.log(message);
 
   //update parent state with last message ID
   handleNewMessage(message.id);
