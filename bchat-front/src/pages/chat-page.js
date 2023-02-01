@@ -1,4 +1,4 @@
-import { useContext, useRef, useEffect, useCallback, useState } from "react";
+import { useContext, useRef, useEffect, useState } from "react";
 import { UserContext } from "../context/user.context";
 import { SocketContext } from "../context/socket.context";
 
@@ -13,47 +13,25 @@ export default function ChatPage() {
   const { currentUser, currentChannel } = useContext(UserContext);
   const { channelMessages, sendMessage } = useContext(SocketContext);
 
-  //START OF CALLBACK REF
-
-  // const useHookWithRefCallback = () => {
-  //   const messageStreamEnd = useRef(null)
-  //   const setRef = useCallback(node => {
-  //     if (messageStreamEnd.current) {
-  //       // Make sure to cleanup any events/references added to the last instance
-  //       messageStreamEnd.scrollIntoView({behavior: "smooth"})
-  //     }
-      
-  //     if (node) {
-  //       // Check if a node is actually passed. Otherwise node would be null.
-  //       // You can now do what you need to, addEventListeners, measure, etc.
-
-  //     }
-      
-  //     // Save a reference to the node
-  //     messageStreamEnd.current = node
-  //   }, [])
-    
-  //   return [setRef]
-  // }
-  
-  // function Component() {
-  //   // In your component you'll still recieve a `ref`, but it 
-  //   // will be a callback function instead of a Ref Object
-  //   const [messageStreamEnd] = useHookWithRefCallback()
-    
-  //   return <div ref={messageStreamEnd}>Ref element</div>
-  // }
-
-
-  // //END OF CALLBACK REF
-  
+  //state setup
   const [messageID, setMessageID] = useState(0);
-  const [selectedChannel, setSelectedChannel] = useState("")
+  const [channelChange, setChannelChange] = useState(false);
+
 
   const handleNewMessage = (newID) => {
-    setMessageID(newID);
+    //if statement stops scrolling from message being deleted 
+    if (newID > messageID) {
+      setMessageID(newID);
+    }
+  };
+
+  //channel change from Channel component
+  const handleChannelChange = () => {
+    //when channel changes it resets messageID state
+    setMessageID(0);
+    //sets state for selected channel
+    setChannelChange(true);
   }
-  
   
   // ref used to scroll to the bottom of message stream
   let messageStreamEnd = useRef(null);
@@ -62,22 +40,18 @@ export default function ChatPage() {
     messageStreamEnd.scrollIntoView({behavior: scrollBehavior})
   }
   
-  //checks if currently in a channel then scrolls to bottom whenever last rendered message has a different ID
-  //ISSUE: currently activates scrollToBottom() when the last message in a stream is updated.
-  //
+  //checks if messages have been rendered then scroll to bottom of message
   useEffect(() => {
-    if (currentChannel) {
-      console.log(currentChannel.channel_id);
+    if (messageID > 0) {
+      //If the channel was switch it will auto scroll to bottom
+      if (channelChange) {
+        scrollToBottom("auto");
+        setChannelChange(false);
+      }
+      //If the channel was not switch then it will smooth scroll to bottom on new message
       scrollToBottom("smooth");
-    };
-  }, [messageID]);
-
-  useEffect(() => {
-    if (currentChannel) {
-      scrollToBottom("auto");
     }
-  }, [currentChannel])
-
+  }, [messageID, channelChange]);
 
 
   const displayMessages = () =>
@@ -99,7 +73,7 @@ export default function ChatPage() {
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <Box component='nav'>
-        <Channel />
+        <Channel handleChannelChange={handleChannelChange} />
       </Box>
       <Box
         sx={{
