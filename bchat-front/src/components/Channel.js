@@ -5,13 +5,18 @@ import CollapseChannelItem from "./CollapseChannelItem";
 
 import List from "@mui/material/List";
 
-export default function Channel() {
+export default function Channel(prop) {
   const { channelUsers, joinChannel, leaveChannel } = useContext(SocketContext);
   const { currentUser, currentChannel, setCurrentChannel } =
     useContext(UserContext);
+  const { handleChannelChange } = prop;
 
   const handleJoinChannel = (id, name) => {
     console.log("joined: ", id, name);
+    
+    //handle channel change in chat-page.js
+    handleChannelChange()
+
 
     //Check if the channel is already joined
     if (currentChannel && currentChannel.channel_id === id) {
@@ -42,7 +47,10 @@ export default function Channel() {
     // Join the channel
     joinChannel(joinMessage);
     // Set current channel in user context
+    console.log(currentChannel);
     setCurrentChannel({ channel_id: id, channel_name: name });
+    console.log(currentChannel);
+
   };
 
   const channelList = () =>
