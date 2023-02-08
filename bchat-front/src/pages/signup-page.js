@@ -1,4 +1,3 @@
-// import React from "react";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../ApiServices/authService";
 import { useContext } from "react";
@@ -8,22 +7,12 @@ import { setJwt } from "../ApiServices/jwtService";
 import { stringAvatar } from "../utils/utils";
 import Avatar from "@mui/material/Avatar";
 import TextField from "@mui/material/TextField";
-// import FormControl from "@mui/material/FormControl";
-// import OutlinedInput from "@mui/material/OutlinedInput";
-// import InputLabel from "@mui/material/InputLabel";
-// import InputAdornment from "@mui/material/InputAdornment";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import CardActions from "@mui/material/CardActions";
-import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import { Button, IconButton } from "@mui/material";
-// import Visibility from "@mui/icons-material/Visibility";
-// import VisibilityOff from "@mui/icons-material/VisibilityOff";
-
-
 import React, { Fragment } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -33,7 +22,7 @@ import * as Yup from 'yup';
 
 export default function SignupPage() {
 
-
+// validation for username, email, password and confirm password
   const validationSchema = Yup.object().shape({
     user_name : Yup.string()
       .required('Username is required')
@@ -50,13 +39,11 @@ export default function SignupPage() {
       .required('Confirm Password is required')
       .oneOf([Yup.ref('pwd'), null], 'Confirm Password does not match'),
    
-  });
-  
+  });  
 
   let navigate = useNavigate();
   const { setCurrentUser } = useContext(UserContext);
   const { getChannelUsers } = useContext(SocketContext);
-
 
 const {
   register,
@@ -67,19 +54,27 @@ const {
   resolver: yupResolver(validationSchema)
 });
 
-// const [signupFormData, setSignupFormData] = React.useState({
-//       user_name: "",
-//       email: "",
-//       pwd: "",
-//     });
+const [signupFormData, setSignupFormData] = React.useState({
+      user_name: "",
+      email: "",
+      pwd: "",
+    });
 
-//   const handleFormChange = (event) => {
-//     const { name, value } = event.target;
-//     setSignupFormData((prevFormData) => ({
-//       ...prevFormData,
-//       [name]: value,
-//     }));
+  const handleFormChange = (event) => {
+    const { name, value } = event.target;
+    setSignupFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };
+
+// const handleEnterSubmit = (event) => {
+//   if (event.key === 'Enter') {
+//       onSubmit();
+//     event.preventDefault();
 //   };
+// };
+
 const onSubmit = async(data) => {
   // console.log(JSON.stringify(data, null, 2));
   const data1 = await registerUser(data);
@@ -130,16 +125,21 @@ return (
     }}
     
   >
-     {/* <Box
+     <Box
           sx={{
             width: "20%",
             outline: "none"
           }}
+          display= "flex"
+          alignItems="center"
         >
-          <h5>SB</h5>
           <Avatar {...stringAvatar(signupFormData.user_name)} />
-        </Box> */}
+        </Box>
  <Box 
+ sx={{
+  width: "70%",
+  outline: "none"
+}}
  >
   <Fragment>
     <Paper  elevation={0}>
@@ -154,35 +154,45 @@ return (
         direction="column"
         alignItems="center"
         justifyContent="center"
-      
-         >
-          <Grid item xs={12} sm={6}>
+        >
+
+          <Grid item xs={12} sm={6}
+          display= "flex"
+          direction="column"
+          alignItems="center">
             <TextField
+             sx={{
+              width: 240
+             }}
               required
               id="username"
               name="user_name"
               label="Username"
-              fullWidth
               margin="dense"
-              // onChange={handleFormChange}
-
+              
               {...register('user_name')}
               error={errors.user_name ? true : false}
+              onChange={handleFormChange}
             />
             <Typography variant="inherit" color="textSecondary">
               {errors.user_name?.message}
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          
+          <Grid item xs={12} sm={6}
+           display= "flex"
+           direction="column"
+           alignItems="center"
+          >
             <TextField
               required
+              sx={{
+                width: 240
+               }}
               id="email"
               name="email"
               label="Email"
-              fullWidth
               margin="dense"
-              // onChange={handleFormChange}
-
               {...register('email')}
               error={errors.email ? true : false}
             />
@@ -190,17 +200,21 @@ return (
               {errors.email?.message}
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={6}>
+
+          <Grid item xs={12} sm={6}
+          display= "flex"
+          direction="column"
+          alignItems="center">
             <TextField
               required
+              sx={{
+                width: 240
+               }}
               id="password"
               name="pwd"
               label="Password"
-              type="password"
-              fullWidth
               margin="dense"
-              // onChange={handleFormChange}
-
+              type = "password"
               {...register('pwd')}
               error={errors.pwd ? true : false}
             />
@@ -208,31 +222,34 @@ return (
               {errors.pwd?.message}
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={6}>
+
+          <Grid item xs={12} sm={6}
+          display= "flex"
+          direction="column"
+          alignItems="center">
             <TextField
               required
+              sx={{
+                width: 240
+               }}
               id="confirmPassword"
               name="confirmPassword"
               label="Confirm Password"
               type="password"
-              fullWidth
               margin="dense"
               {...register('confirmPassword')}
               error={errors.confirmPassword ? true : false}
+              // onKeyDown={handleEnterSubmit}
             />
             <Typography variant="inherit" color="textSecondary">
               {errors.confirmPassword?.message}
             </Typography>
           </Grid>
-         
-       
-     
         
-        <Box mt={3}
-        >
+        <Box mt={3}>
           <Button
             variant="contained"
-            color="primary"
+            color="primary"      
             onClick={handleSubmit(onSubmit)}
           >
             Register
