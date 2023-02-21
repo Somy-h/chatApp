@@ -7,7 +7,6 @@ import { stringLargeAvatar } from "../utils/utils";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Hidden, Box, Paper, Grid, Typography, Avatar, IconButton, List, ListItem, ListItemText, ListItemAvatar } from "@mui/material";
 
-//THIS IS A EXAMPLE COMMIT AND PUSH
 
 export default function Message(prop) {
   const { message, handleNewMessage } = prop;
