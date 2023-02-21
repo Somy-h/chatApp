@@ -23,7 +23,7 @@ CREATE TABLE messages (
   id INT AUTO_INCREMENT NOT NULL,
   channel_id INT NOT NULL,
   user_id INT NOT NULL,
-  message VARCHAR(255) NOT NULL,
+  message VARCHAR(400) NOT NULL,
   time DATETIME NOT NULL,
   inactive TINYINT NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
