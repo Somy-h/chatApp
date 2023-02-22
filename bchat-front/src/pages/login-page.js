@@ -31,14 +31,11 @@ export default function LoginPage() {
 
 
   const validationSchema = Yup.object().shape({
-   
     email: Yup.string()
       .required('Email is required')
       .email('Email is invalid'),
     pwd: Yup.string()
       .required('Password is required'),
-    
-   
   });  
 
   const {
@@ -84,6 +81,7 @@ export default function LoginPage() {
     getChannelUsers();
     navigate("/chat");
   };
+  
 
   return (
     <Box
