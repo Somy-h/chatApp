@@ -7,6 +7,7 @@ import { stringLargeAvatar } from "../utils/utils";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { Hidden, Box, Paper, Grid, Typography, Avatar, IconButton, List, ListItem, ListItemText, ListItemAvatar } from "@mui/material";
 
+
 export default function Message(prop) {
   const { message, handleNewMessage } = prop;
   const { currentUser } = useContext(UserContext);
