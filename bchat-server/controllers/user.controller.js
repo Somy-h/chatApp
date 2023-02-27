@@ -33,6 +33,7 @@ exports.createUser = async (req, res) => {
 };
 
 exports.updateUser = async (req, res, err) => {
+  console.log("update User");
   if (err === true) {
     console.log(err.message);
     res.json({

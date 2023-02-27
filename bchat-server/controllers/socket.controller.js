@@ -9,7 +9,6 @@ var users = {};
 
 exports.initChannelUsers = async() => {
   channels = await socketMessageModel.getChannels();
-  
   channels && channels.forEach((item) => {
     return (users[item.channel_name] = []);
   });
@@ -47,7 +46,7 @@ exports.joinChannel = async (io, socket, joinMessage) => {
   // disconnect socket with joined channel
   socket.on("disconnect", () => {
     // leave channel
-    handleLeaveChannel(io, socket, joinMessage);
+    leaveChannel(io, socket, joinMessage);
     // console.log("disconnect");
     socket.disconnect();
   });
