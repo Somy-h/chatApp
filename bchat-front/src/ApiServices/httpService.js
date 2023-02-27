@@ -52,10 +52,10 @@ export const post = async (url, body, headers) => {
   }
 };
 
-export const postFormData = async (url, formData, headers) => {
+export const patchFormData = async (url, formData, headers) => {
   try {
     const res = await fetch(url, {
-      method: "POST",
+      method: "PATCH",
       enctype: "multipart/form-data",
       headers: {
         Authorization: `Bearer ${getJwt()}`,

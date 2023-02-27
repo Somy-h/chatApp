@@ -1,229 +1,39 @@
-const MESSAGE_TYPE = {
-  GET_CHANNELS: "get_channels",
-  CHANNEL_USERS: "channel_users",
-  JOIN_CHANNEL: "join_channel",
-  SEND_MESSAGE: "send_message",
-  RECEIVE_MESSAGE: "receive_message",
-  DELETE_MESSAGE: "delete_message",
-  LEAVE_CHANNEL: "leave_channel",
-};
+const MESSAGE_TYPE = require("./config/message-types");
+const socketController = require("./controllers/socket.controller");
 
-var channels = [];
-var users = {};
-
-module.exports = async (io, pool) => {
+module.exports = async (io) => {
   try {
-    getChannelsInitUsers(pool).catch((err) => console.log(err));
+    socketController.initChannelUsers();
 
     io.on("connection", (socket) => {
       console.log("a user connected: ", socket.id);
 
       // Message: Get user list in channel
       socket.on(MESSAGE_TYPE.CHANNEL_USERS, () => {
-        console.log("get users from channel# with users", users);
-
-        // Only to the sender
-        //console.log(users);
-        socket.emit(MESSAGE_TYPE.CHANNEL_USERS, {
-          channels,
-          users,
-        });
+        socketController.getChannelUsers(socket);
       });
 
       // Message: Join channel
       socket.on(MESSAGE_TYPE.JOIN_CHANNEL, (joinMessage) => {
-        // join the channel and update channels & users
-        handleJoinChannel(socket, joinMessage);
-
-        // Fetch channel messages from DB
-        getChannelMessagesFromDB(pool, joinMessage.channel_id)
-          .then((channelMessages) => {
-            // Send join message to the sender only
-            console.log("Sending channel messages to the sender");
-            socket.emit(MESSAGE_TYPE.JOIN_CHANNEL, channelMessages);
-          })
-          .catch((err) => {
-            socket.leave(String(joinMessage.channel_id));
-            deleteUserFromUsers(joinMessage.user_id, joinMessage.channel_name);
-            throw err;
-          });
-
-        // disconnect socket with joined channel
-        socket.on("disconnect", () => {
-          // leave channel
-          handleLeaveChannel(io, socket, joinMessage);
-          console.log("disconnect");
-          socket.disconnect();
-        });
+        socketController.joinChannel(io, socket, joinMessage);
       });
 
       // Message: message received from client
       socket.on(MESSAGE_TYPE.SEND_MESSAGE, (message) => {
-        console.log("message received: ");
-        console.dir(message);
-
-        // Insert message into DB
-        insertMessageIntoDB(pool, message).then((msgId) => {
-          fetchMessageFromDB(pool, msgId).then((newMsg) => {
-            console.log("send to client new message ID: ", msgId, socket.rooms);
-            console.dir(newMsg);
-            socket.nsp
-              .to(String(newMsg.channel_id))
-              .emit(MESSAGE_TYPE.RECEIVE_MESSAGE, newMsg);
-          });
-        });
+        socketController.sendMessage(socket, message);
       });
 
       // Message: delete message
       socket.on(MESSAGE_TYPE.DELETE_MESSAGE, (channel_id, messageId) => {
-        console.log("delete received: ");
-        console.dir(messageId);
-
-        // Update inactive column in messages table in database
-        updateInactiveMessageFromDB(pool, messageId).then((isSuccess) => {
-          if (isSuccess) {
-            console.log("send to client: ", messageId);
-
-            socket.nsp
-              .to(String(channel_id))
-              .emit(MESSAGE_TYPE.DELETE_MESSAGE, messageId);
-          }
-        });
+        socketController.deleteMessage(socket, channel_id, messageId);
       });
 
       // Message: leave the channel
       socket.on(MESSAGE_TYPE.LEAVE_CHANNEL, (leaveMsg) => {
-        handleLeaveChannel(io, socket, leaveMsg);
+        socketController.leaveChannel(io, socket, leaveMsg);
       });
     });
   } catch (err) {
     console.log("Error: ", err.message);
   }
 };
-
-function handleJoinChannel(socket, joinMsg) {
-  socket.join(String(joinMsg.channel_id));
-
-  // Add user into users
-
-  users[joinMsg.channel_name].push({
-    user_id: joinMsg.user_id,
-    user_name: joinMsg.user_name,
-    avatar: joinMsg.avatar,
-  });
-  console.log("joined: ", users);
-  // Send updated channel users
-  socket.nsp.to(String(joinMsg.channel_id)).emit(MESSAGE_TYPE.CHANNEL_USERS, {
-    channels,
-    users,
-  });
-}
-
-function deleteUserFromUsers(user_id, channel_name) {
-  users[channel_name] = users[channel_name].filter(
-    (user) => user.user_id !== user_id
-  );
-  //console.log("left: ", users[channel_name]);
-}
-
-function handleLeaveChannel(io, socket, leaveMsg) {
-  socket.leave(String(leaveMsg.channel_id));
-  //console.log("Server: leave the channel", socket.rooms);
-
-  // Delete user from users
-  deleteUserFromUsers(leaveMsg.user_id, leaveMsg.channel_name);
-
-  // Send updated channel users to everyone
-  //socket.nsp.to(String(leaveMsg.channel_id)).emit(MESSAGE_TYPE.CHANNEL_USERS, {
-  io.emit(MESSAGE_TYPE.CHANNEL_USERS, {
-    channels,
-    users,
-  });
-}
-
-//DB Library ***************
-
-async function getChannelsInitUsers(pool) {
-  try {
-    const result = await pool.query("SELECT * FROM channels");
-    console.log(result[0]);
-    channels = result[0];
-
-    channels.forEach((item) => {
-      return (users[item.channel_name] = []);
-    });
-    console.log(users);
-  } catch (err) {
-    throw new Error("Fail to get channels from database");
-  }
-}
-
-async function getChannelMessagesFromDB(pool, channelId) {
-  try {
-    const result = await pool.query(`
-    SELECT m.id, m.channel_id, c.channel_name, m.user_id, u.user_name, u.avatar, m.message, m.time, m.inactive
-    FROM messages AS m
-      INNER JOIN channels AS c ON m.channel_id = c.id
-      INNER JOIN users AS u ON m.user_id = u.id
-    WHERE m.channel_id = ${channelId} AND m.inactive = 0
-    LIMIT 500`);
-
-    return result[0];
-  } catch (err) {
-    throw new Error("Fail to get messages from database table");
-  }
-}
-
-function getChannelsWithState() {
-  const result = channels.map((channel) => {
-    return {
-      ...channel,
-      isActive: users[channel.channel_name] ? true : false,
-    };
-  });
-  console.log(result);
-
-  return result;
-}
-
-async function insertMessageIntoDB(pool, message) {
-  try {
-    const result = await pool.query(
-      `INSERT INTO messages (channel_id, user_id, message, time) VALUES (${message.channel_id}, ${message.user_id}, "${message.message}", now())`
-    );
-
-    const returnId = result[0]?.insertId;
-    console.log("Inserted recent message id: ", returnId);
-    return returnId;
-  } catch (err) {
-    throw new Error("Fail to insert message into database table");
-  }
-}
-
-async function updateInactiveMessageFromDB(pool, messageId) {
-  try {
-    const result = await pool.query(`
-      UPDATE messages
-      SET inactive = 1 
-      WHERE id = ${messageId}`);
-    console.log("DB returned: ", result);
-    return result[0]?.changedRows === 1 ? true : false;
-  } catch (err) {
-    throw new Error("Fail to update messages table.");
-  }
-}
-
-async function fetchMessageFromDB(pool, messageId) {
-  try {
-    const [[message]] = await pool.query(`
-    SELECT  m.id, m.channel_id, c.channel_name, m.user_id, u.user_name, u.avatar, m.message, m.time, m.inactive
-    FROM messages AS m
-      INNER JOIN channels AS c ON m.channel_id = c.id
-      INNER JOIN users AS u ON m.user_id = u.id
-    WHERE m.id = ${messageId} `);
-    console.log("DB returned: ", message);
-    return message;
-  } catch (err) {
-    throw new Error("Fail to fetch last updated message.");
-  }
-}
