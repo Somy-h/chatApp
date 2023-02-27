@@ -111,7 +111,7 @@ export default function SettingPage() {
 
     // Call API to update the user settings
     try {
-      const data = await updateUserProfile(formData);
+      const data = await updateUserProfile(formData, settingFormData.id);
       if (data) {
         const token = data.jwt;
         console.log("token: ", token);
