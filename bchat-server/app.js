@@ -11,7 +11,7 @@ const corsOptions = {
 const io = new Server(server, {
   cors: {
     ...corsOptions,
-    origin: "http://localhost:3000",
+    origin: "*",
   },
 });
 
