@@ -5,7 +5,7 @@ const MESSAGE_TYPE = require("../config/message-types");
 
 var channels = [];
 var users = {};
-
+var _this = this;
 
 exports.initChannelUsers = async() => {
   channels = await socketMessageModel.getChannels();
@@ -40,13 +40,13 @@ exports.joinChannel = async (io, socket, joinMessage) => {
     .catch((err) => {
       socket.leave(String(joinMessage.channel_id));
       deleteUserFromUsers(joinMessage.user_id, joinMessage.channel_name);
-      throw err;
+      console.log(err.message);
     });
 
   // disconnect socket with joined channel
   socket.on("disconnect", () => {
     // leave channel
-    leaveChannel(io, socket, joinMessage);
+    _this.leaveChannel(io, socket, joinMessage);
     // console.log("disconnect");
     socket.disconnect();
   });

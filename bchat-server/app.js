@@ -3,6 +3,8 @@ const cors = require("cors");
 const app = express();
 const server = require("http").createServer(app);
 const { Server } = require("socket.io");
+const AppError = require("./utils/appError");
+const globalErrorHandler = require("./controllers/error.controller");
 
 const corsOptions = {
   origin: "*",
@@ -11,7 +13,7 @@ const corsOptions = {
 const io = new Server(server, {
   cors: {
     ...corsOptions,
-    origin: "*",
+    origin: "http://localhost:3000",
   },
 });
 
@@ -31,5 +33,9 @@ const userRouter = require("./routes/user.route");
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", userRouter);
 
+app.all("*", (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
+app.use(globalErrorHandler);
 
 module.exports = server;
