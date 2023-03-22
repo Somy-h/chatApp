@@ -13,6 +13,7 @@ module.exports.getUser = async (req, id) => {
     'SELECT * FROM users WHERE id = ?',
     [id]
   );
+  console.log(user);
   return user;
 }
 
